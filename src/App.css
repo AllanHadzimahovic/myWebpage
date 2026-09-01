@@ -6,6 +6,20 @@
   background:
     radial-gradient(ellipse 70% 55% at 50% 45%, #1a1f2e 0%, transparent 70%),
     #0b0d12;
+  transition: filter 420ms ease;
+}
+
+.landing.is-dimmed .stage {
+  opacity: 0.14;
+  filter: blur(3px);
+  pointer-events: none;
+  transition:
+    opacity 420ms ease,
+    filter 420ms ease;
+}
+
+.landing.is-dimmed .project-marker {
+  opacity: 0;
 }
 
 .stage {
@@ -13,6 +27,9 @@
   width: min(92vw, 720px);
   aspect-ratio: 1;
   max-height: min(92svh, 720px);
+  transition:
+    opacity 420ms ease,
+    filter 420ms ease;
 }
 
 .portrait {
@@ -36,6 +53,10 @@
   position: absolute;
   display: grid;
   place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
   transform: translate(-50%, -50%);
   border-radius: 18px;
   overflow: hidden;
@@ -45,8 +66,9 @@
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
-    filter 180ms ease;
+    opacity 280ms ease;
   z-index: 1;
+  color: inherit;
 }
 
 .project-marker img {
@@ -54,6 +76,7 @@
   height: 100%;
   display: block;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .project-marker:hover,
@@ -66,6 +89,200 @@
   z-index: 3;
 }
 
+.project-marker.is-active {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.project-marker:disabled:not(.is-active) {
+  cursor: default;
+}
+
+.flying-icon {
+  position: fixed;
+  z-index: 60;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(94, 234, 212, 0.45),
+    0 14px 36px rgba(0, 0, 0, 0.55);
+  transition:
+    top 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 520ms ease;
+  pointer-events: none;
+}
+
+.flying-icon.is-settled {
+  border-radius: 16px;
+}
+
+.flying-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.project-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background:
+    linear-gradient(180deg, rgba(11, 13, 18, 0.72) 0%, rgba(11, 13, 18, 0.94) 28%, #0b0d12 100%);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(0.985);
+  transition:
+    opacity 420ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 420ms;
+  pointer-events: none;
+}
+
+.project-panel.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 420ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0s;
+  pointer-events: auto;
+}
+
+.project-panel__inner {
+  width: min(760px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 5.5rem 0 3rem;
+}
+
+.project-panel__close {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.25rem;
+  z-index: 61;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(20, 24, 34, 0.9);
+  color: #e8eaef;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.project-panel__close:hover,
+.project-panel__close:focus-visible {
+  border-color: rgba(94, 234, 212, 0.55);
+  outline: none;
+}
+
+.project-panel__header {
+  margin-bottom: 2rem;
+  padding-right: 5rem;
+}
+
+.project-panel__eyebrow {
+  margin: 0 0 0.4rem;
+  color: #5eead4;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-panel__header h1 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.15;
+}
+
+.project-panel__summary {
+  margin: 0;
+  color: #a8b0c2;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.project-panel__section {
+  margin-bottom: 2rem;
+}
+
+.project-panel__section h2 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8b93a7;
+}
+
+.project-panel__body {
+  margin: 0;
+  color: #d5dae6;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.project-panel__video {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #141820;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.project-panel__video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.project-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.project-panel__list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #e8eaef;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.project-panel__list a::after {
+  content: '↗';
+  color: #5eead4;
+  opacity: 0.85;
+}
+
+.project-panel__list a:hover,
+.project-panel__list a:focus-visible {
+  border-color: rgba(94, 234, 212, 0.45);
+  background: rgba(94, 234, 212, 0.06);
+  outline: none;
+}
+
 @media (max-width: 640px) {
   .portrait {
     width: min(48%, 220px);
@@ -73,5 +290,18 @@
 
   .project-marker {
     border-radius: 14px;
+  }
+
+  .project-panel__inner {
+    padding-top: 5rem;
+  }
+
+  .project-panel__header {
+    padding-right: 4.5rem;
+  }
+
+  .project-panel__close {
+    left: 1rem;
+    top: 1rem;
   }
 }
