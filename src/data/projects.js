@@ -1,60 +1,61 @@
-/** Curated project list — quality over quantity. Update links when public. */
-
+/**
+ * Placeholder project markers around the portrait.
+ * Replace `icon` with your real logo path and set `title` / `href` when ready.
+ */
 export const projects = [
   {
-    id: 'chess-robot',
-    title: 'Chess Robot',
-    summary:
-      'Designed, 3D-printed, and programmed a chess-playing robot in C++ — from mechanics to software.',
-    tags: ['C++', 'Hardware', 'Robotics'],
-    featured: true,
-    links: {
-      demo: '',
-      repo: '',
-      video: '',
-      report: '',
-    },
+    id: 'project-1',
+    title: 'Project 1',
+    icon: '/projects/project-1.svg',
+    href: '#',
+    // percent positions relative to the stage (portrait sits at center)
+    x: 12,
+    y: 22,
+    size: 56,
   },
   {
-    id: 'tower-defense',
-    title: 'Tower Defense (Unity)',
-    summary:
-      'Built a tower defense game in Unity with C# — gameplay systems, enemies, and level flow.',
-    tags: ['C#', 'Unity', 'Game'],
-    featured: true,
-    links: {
-      demo: '',
-      repo: '',
-      video: '',
-      report: '',
-    },
+    id: 'project-2',
+    title: 'Project 2',
+    icon: '/projects/project-2.svg',
+    href: '#',
+    x: 78,
+    y: 18,
+    size: 64,
   },
   {
-    id: 'multi-container',
-    title: 'Multi-Container App',
-    summary:
-      'Docker Compose setup with a Node app and supporting services — practice shipping containerized work.',
-    tags: ['Docker', 'Node', 'Compose'],
-    featured: true,
-    links: {
-      demo: '',
-      repo: '',
-      video: '',
-      report: '',
-    },
+    id: 'project-3',
+    title: 'Project 3',
+    icon: '/projects/project-3.svg',
+    href: '#',
+    x: 88,
+    y: 48,
+    size: 52,
   },
   {
-    id: 'portfolio',
-    title: 'This Portfolio',
-    summary:
-      'A React portfolio focused on clarity for hiring managers, with room for personality.',
-    tags: ['React', 'Vite', 'CSS'],
-    featured: false,
-    links: {
-      demo: '',
-      repo: '',
-      video: '',
-      report: '',
-    },
+    id: 'project-4',
+    title: 'Project 4',
+    icon: '/projects/project-4.svg',
+    href: '#',
+    x: 74,
+    y: 78,
+    size: 60,
+  },
+  {
+    id: 'project-5',
+    title: 'Project 5',
+    icon: '/projects/project-5.svg',
+    href: '#',
+    x: 18,
+    y: 72,
+    size: 58,
+  },
+  {
+    id: 'project-6',
+    title: 'Project 6',
+    icon: '/projects/project-6.svg',
+    href: '#',
+    x: 8,
+    y: 48,
+    size: 50,
   },
 ]

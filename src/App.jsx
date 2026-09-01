@@ -1,23 +1,37 @@
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Intro from './sections/Intro'
-import About from './sections/About'
-import Projects from './sections/Projects'
-import Contact from './sections/Contact'
+import { projects } from './data/projects.js'
 import './App.css'
 
 function App() {
   return (
-    <div className="app">
-      <Navbar />
-      <main>
-        <Intro />
-        <About />
-        <Projects />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <main className="landing">
+      <div className="stage" aria-label="Portfolio landing">
+        <img
+          className="portrait"
+          src="/me.jpg"
+          alt="Portrait placeholder"
+          width={320}
+          height={320}
+        />
+
+        {projects.map((project) => (
+          <a
+            key={project.id}
+            className="project-marker"
+            href={project.href}
+            title={project.title}
+            aria-label={project.title}
+            style={{
+              left: `${project.x}%`,
+              top: `${project.y}%`,
+              width: project.size,
+              height: project.size,
+            }}
+          >
+            <img src={project.icon} alt="" width={project.size} height={project.size} />
+          </a>
+        ))}
+      </div>
+    </main>
   )
 }
 
