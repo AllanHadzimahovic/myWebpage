@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { projects } from './data/projects.js'
+import { assetUrl } from './assetUrl.js'
 import ProjectPanel from './ProjectPanel.jsx'
 import VolleyballGame from './VolleyballGame.jsx'
 import './App.css'
@@ -127,7 +128,7 @@ function App() {
       <div className="stage" aria-hidden={isOpen}>
         <img
           className="portrait"
-          src="/me.jpg"
+          src={assetUrl('/me.jpg')}
           alt="Allan Hadzimahovic"
           width={320}
           height={320}
@@ -184,7 +185,7 @@ function App() {
               openProject(project.id)
             }}
           >
-            <img src={project.icon} alt="" width={project.size} height={project.size} />
+            <img src={assetUrl(project.icon)} alt="" width={project.size} height={project.size} />
           </button>
         )
       })}
@@ -211,7 +212,7 @@ function App() {
             style={style}
             aria-hidden="true"
           >
-            <img src={flight.icon} alt="" />
+            <img src={assetUrl(flight.icon)} alt="" />
           </div>
         )
       })}
@@ -221,7 +222,7 @@ function App() {
       {volleyballOpen && (
         <VolleyballGame
           onClose={() => setVolleyballOpen(false)}
-          ballSrc="/projects/project-2.png"
+          ballSrc={assetUrl('/projects/project-2.png')}
         />
       )}
     </main>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { assetUrl } from './assetUrl.js'
 
 function isYoutubeItem(item) {
   return item?.type === 'youtube' || Boolean(item?.youtubeId)
@@ -69,7 +70,7 @@ export default function ProjectGallery({ images, title, heading = 'Gallery', fit
           ) : (
             <img
               key={current.src}
-              src={current.src}
+              src={assetUrl(current.src)}
               alt={current.alt || `${title} photo ${safeIndex + 1} of ${total}`}
               className="project-gallery__image"
             />

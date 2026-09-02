@@ -4,6 +4,7 @@ import ModelViewer from './ModelViewer.jsx'
 import UnityPlayer from './UnityPlayer.jsx'
 import WebEmbed from './WebEmbed.jsx'
 import ContactComposer from './ContactComposer.jsx'
+import { assetUrl } from './assetUrl.js'
 
 function fileNameFromUrl(url) {
   try {
@@ -32,6 +33,10 @@ export default function ProjectPanel({ project, open, onClose }) {
     seen.add(file.url)
     return true
   })
+  const resolvedDownloads = uniqueDownloads.map((file) => ({
+    ...file,
+    href: assetUrl(file.url),
+  }))
 
   const isContact = Boolean(project.contact)
 
@@ -71,7 +76,7 @@ export default function ProjectPanel({ project, open, onClose }) {
             <ul className="language-sticker-grid">
               {project.languageStickers.map((lang) => (
                 <li key={lang.title} className="language-sticker-grid__item">
-                  <img src={lang.src} alt="" className="language-sticker-grid__icon" />
+                  <img src={assetUrl(lang.src)} alt="" className="language-sticker-grid__icon" />
                   <span className="language-sticker-grid__label">{lang.title}</span>
                 </li>
               ))}
@@ -85,7 +90,7 @@ export default function ProjectPanel({ project, open, onClose }) {
             <ModelViewer
               key={`${project.id}-model`}
               title={project.model3d.title || `${project.title} assembly`}
-              src={project.model3d.src}
+              src={assetUrl(project.model3d.src)}
               allowUpload={project.model3d.allowUpload !== false}
               note={project.model3d.note}
             />
@@ -98,7 +103,7 @@ export default function ProjectPanel({ project, open, onClose }) {
             <UnityPlayer
               key={`${project.id}-unity`}
               title={project.unityWebGL.title || project.title}
-              src={project.unityWebGL.src}
+              src={assetUrl(project.unityWebGL.src)}
               note={project.unityWebGL.note}
             />
           </div>
@@ -110,7 +115,7 @@ export default function ProjectPanel({ project, open, onClose }) {
             <WebEmbed
               key={`${project.id}-embed`}
               title={project.webEmbed.title || project.title}
-              src={project.webEmbed.src}
+              src={assetUrl(project.webEmbed.src)}
               note={project.webEmbed.note}
               status={project.webEmbed.status}
             />
@@ -171,7 +176,7 @@ export default function ProjectPanel({ project, open, onClose }) {
               .filter((pdf) => pdf.embed)
               .map((pdf) => (
                 <div className="project-panel__pdf" key={`embed-${pdf.url}`}>
-                  <iframe src={`${pdf.url}#view=FitH`} title={pdf.title} loading="lazy" />
+                  <iframe src={`${assetUrl(pdf.url)}#view=FitH`} title={pdf.title} loading="lazy" />
                 </div>
               ))}
           </div>
@@ -182,19 +187,19 @@ export default function ProjectPanel({ project, open, onClose }) {
               <CodeViewer
                 key={`${snippet.title}-${snippet.url}`}
                 title={snippet.title}
-                url={snippet.url}
+                url={assetUrl(snippet.url)}
                 language={snippet.language || 'cpp'}
               />
             ))
           : null}
 
-        {uniqueDownloads.length ? (
+        {resolvedDownloads.length ? (
           <div className="project-panel__section">
             <h2>Downloads</h2>
             <ul className="project-panel__list">
-              {uniqueDownloads.map((file) => (
+              {resolvedDownloads.map((file) => (
                 <li key={`${file.title}-${file.url}`}>
-                  <a href={file.url} download={file.filename || fileNameFromUrl(file.url)}>
+                  <a href={file.href} download={file.filename || fileNameFromUrl(file.url)}>
                     {file.title}
                   </a>
                 </li>

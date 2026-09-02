@@ -31,6 +31,8 @@ function gamesExactFiles() {
 }
 
 // https://vite.dev/config/
+// base must match the GitHub Pages project URL path: /<repo>/
 export default defineConfig({
+  base: '/myWebpage/',
   plugins: [react(), gamesExactFiles()],
 })
