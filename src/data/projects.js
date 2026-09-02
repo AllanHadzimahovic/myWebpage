@@ -1,19 +1,20 @@
 /**
  * Project markers around the portrait.
  * Fill in description / youtubeId / pdfs / links for each project detail page.
+ * sticker: true → die-cut PNG with baked white silhouette (no rounded CSS frame).
  */
 export const projects = [
   {
     id: 'project-1',
-    title: 'Project 1',
-    icon: '/projects/project-1.svg',
+    title: 'LEGO',
+    icon: '/projects/project-1.png',
+    sticker: true,
     x: 12,
     y: 22,
-    size: 56,
+    size: 72,
     summary: 'A short overview of what this project is about.',
     description:
       'Replace this text with the full story: problem, approach, what you built, and what you learned. You can keep multiple paragraphs here.',
-    // Paste a YouTube video id, e.g. 'abc123XYZ01'
     youtubeId: '',
     pdfs: [
       { title: 'Project brief (PDF)', url: '#' },
@@ -26,11 +27,12 @@ export const projects = [
   },
   {
     id: 'project-2',
-    title: 'Project 2',
-    icon: '/projects/project-2.svg',
+    title: 'Volleyball',
+    icon: '/projects/project-2.png',
+    sticker: true,
     x: 78,
     y: 18,
-    size: 64,
+    size: 72,
     summary: 'Another project placeholder ready for your write-up.',
     description:
       'Use this space for context, screenshots notes, and outcomes. Embed a walkthrough video below when you have one.',
@@ -40,11 +42,12 @@ export const projects = [
   },
   {
     id: 'project-3',
-    title: 'Project 3',
-    icon: '/projects/project-3.svg',
+    title: 'Typewriter',
+    icon: '/projects/project-3.png',
+    sticker: true,
     x: 88,
     y: 48,
-    size: 52,
+    size: 72,
     summary: 'Placeholder for a third project.',
     description:
       'Describe the stack, constraints, and results. Add a YouTube id, PDFs, and external links in projects.js.',
@@ -54,11 +57,12 @@ export const projects = [
   },
   {
     id: 'project-4',
-    title: 'Project 4',
-    icon: '/projects/project-4.svg',
+    title: 'Polaroid',
+    icon: '/projects/project-4.png',
+    sticker: true,
     x: 74,
     y: 78,
-    size: 60,
+    size: 72,
     summary: 'Placeholder for a fourth project.',
     description: 'Expand on the work behind this icon when you are ready.',
     youtubeId: '',
@@ -67,11 +71,12 @@ export const projects = [
   },
   {
     id: 'project-5',
-    title: 'Project 5',
-    icon: '/projects/project-5.svg',
+    title: 'WhatsApp',
+    icon: '/projects/project-5.png',
+    sticker: true,
     x: 18,
     y: 72,
-    size: 58,
+    size: 72,
     summary: 'Placeholder for a fifth project.',
     description: 'Tell the story of this project here — goals, process, and impact.',
     youtubeId: '',
@@ -80,11 +85,12 @@ export const projects = [
   },
   {
     id: 'project-6',
-    title: 'Project 6',
-    icon: '/projects/project-6.svg',
+    title: 'LinkedIn',
+    icon: '/projects/project-6.png',
+    sticker: true,
     x: 8,
     y: 48,
-    size: 50,
+    size: 72,
     summary: 'Placeholder for a sixth project.',
     description: 'This detail page supports video embeds, PDF downloads, and outbound links.',
     youtubeId: '',

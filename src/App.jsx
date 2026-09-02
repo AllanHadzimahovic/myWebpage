@@ -102,18 +102,19 @@ function App() {
         <img
           className="portrait"
           src="/me.jpg"
-          alt="Portrait placeholder"
+          alt="Allan Hadzimahovic"
           width={320}
           height={320}
         />
 
         {projects.map((project) => {
           const isActive = project.id === activeId
+          const sticker = Boolean(project.sticker)
           return (
             <button
               key={project.id}
               type="button"
-              className={`project-marker${isActive ? ' is-active' : ''}`}
+              className={`project-marker${sticker ? ' is-sticker' : ''}${isActive ? ' is-active' : ''}`}
               title={project.title}
               aria-label={`Open ${project.title}`}
               aria-expanded={isActive}
@@ -137,7 +138,7 @@ function App() {
 
       {active && flyFrom ? (
         <div
-          className={`flying-icon${flySettled ? ' is-settled' : ''}`}
+          className={`flying-icon${active.sticker ? ' is-sticker' : ''}${flySettled ? ' is-settled' : ''}`}
           style={flyStyle}
           aria-hidden="true"
         >
