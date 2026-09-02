@@ -8,7 +8,7 @@ import './App.css'
 const CORNER_SIZE = 128
 const CORNER_INSET = 20
 const CORNER_GAP = 10
-const CLOSE_MS = 420
+const CLOSE_MS = 1040
 /** Leave room for the top-left Close control so grouped stickers stay on-screen. */
 const CLOSE_CLEARANCE = 110
 

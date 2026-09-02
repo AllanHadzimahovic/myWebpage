@@ -77,9 +77,16 @@ export const projects = [
     y: 82,
     size: 108,
     rotate: -6,
-    summary: 'Placeholder for a photography / media project.',
-    description: 'Expand on the work behind this icon when you are ready.',
+    summary: 'Photography — polaroid stills.',
+    description: 'Instant photos from the Polaroid. Browse the prints in the gallery below.',
     youtubeId: '',
+    galleryHeading: 'Photos',
+    gallery: [
+      {
+        src: '/projects/polaroid/01.webp',
+        alt: 'Meme: a late project hires a project manager, then spends 20% of time in meetings',
+      },
+    ],
     pdfs: [],
     links: [],
   },
@@ -141,7 +148,7 @@ export const projects = [
     summary: 'Playable Unity WebGL game — defend, build, and survive.',
     description:
       'Real Balloons is a Unity game with custom gameplay systems (enemies, turrets, menus, and a game state machine). This page embeds the WebGL build so visitors can play in the browser. Click Play to load the game (first load downloads the build).',
-    youtubeId: '',
+    youtubeId: '8knwQV1mQww',
     unityWebGL: {
       title: 'Real Balloons',
       // Cache-bust so browsers don't reuse an old compressed (.br) index.html

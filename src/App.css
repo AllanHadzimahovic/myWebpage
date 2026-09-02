@@ -247,11 +247,11 @@
     0 0 0 2px #fff,
     0 14px 36px rgba(0, 0, 0, 0.55);
   transition:
-    top 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    left 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    width 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-radius 520ms ease;
+    top 1040ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 1040ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 1040ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 1040ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 1040ms ease;
   pointer-events: none;
 }
 
@@ -1039,6 +1039,25 @@
 
 .project-gallery__frame--video {
   aspect-ratio: 16 / 9;
+}
+
+.project-gallery__frame--empty {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  max-width: min(100%, 28rem);
+  margin-inline: auto;
+  background: #ece7dc;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.project-gallery__empty-label {
+  margin: 0;
+  color: #6b6458;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
 }
 
 /* Tall slides (e.g. Scrum guide pages) — taller frame, capped so it still fits the panel */

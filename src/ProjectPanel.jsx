@@ -137,7 +137,7 @@ export default function ProjectPanel({ project, open, onClose }) {
           </div>
         ) : null}
 
-        {project.gallery?.length ? (
+        {Array.isArray(project.gallery) ? (
           <ProjectGallery
             key={`${project.id}-gallery`}
             images={project.gallery}

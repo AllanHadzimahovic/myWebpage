@@ -31,7 +31,18 @@ export default function ProjectGallery({ images, title, heading = 'Gallery', fit
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [total])
 
-  if (!total) return null
+  if (!total) {
+    return (
+      <div className="project-panel__section">
+        <h2>{heading}</h2>
+        <div className="project-gallery" aria-label={`${title} ${heading}`}>
+          <div className="project-gallery__frame project-gallery__frame--empty">
+            <p className="project-gallery__empty-label">No photos yet</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const current = images[safeIndex]
   const showingVideo = isYoutubeItem(current)
