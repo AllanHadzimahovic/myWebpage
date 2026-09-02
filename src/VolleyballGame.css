@@ -1,0 +1,303 @@
+.vb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 55%, rgba(26, 40, 32, 0.28) 0%, transparent 65%),
+    rgba(11, 13, 18, 0.42);
+  overflow: hidden;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.vb-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 5;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.vb-close:hover,
+.vb-close:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+}
+
+.vb-score {
+  position: absolute;
+  top: 1.15rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #e8eef7;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.vb-score strong {
+  color: #5eead4;
+  font-size: 1.1rem;
+  margin-left: 0.2rem;
+}
+
+.vb-hint {
+  position: absolute;
+  top: 4.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  margin: 0;
+  width: min(90vw, 22rem);
+  text-align: center;
+  color: rgba(232, 238, 247, 0.72);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.vb-net {
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  bottom: 18%;
+  width: 14px;
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: center top;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.vb-net.is-in {
+  animation: vb-net-in 480ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes vb-net-in {
+  from {
+    transform: translateX(-50%) scaleY(0);
+  }
+  to {
+    transform: translateX(-50%) scaleY(1);
+  }
+}
+
+.vb-net__mesh {
+  position: absolute;
+  inset: 8px 3px 8px 3px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      rgba(232, 238, 247, 0.35) 7px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 6px,
+      rgba(232, 238, 247, 0.28) 6px 7px
+    ),
+    rgba(94, 234, 212, 0.08);
+  border: 1px solid rgba(232, 238, 247, 0.35);
+  box-shadow: 0 0 18px rgba(94, 234, 212, 0.12);
+}
+
+.vb-net__post {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, #d7dee8 0%, #8b95a5 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
+}
+
+.vb-net__post--left {
+  left: 0;
+}
+
+.vb-net__post--right {
+  right: 0;
+}
+
+.vb-countdown {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  font-size: clamp(4rem, 18vw, 7rem);
+  font-weight: 800;
+  color: #5eead4;
+  text-shadow: 0 0 40px rgba(94, 234, 212, 0.45);
+  animation: vb-pop 700ms ease;
+  pointer-events: none;
+}
+
+@keyframes vb-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.55);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  100% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.vb-ball {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: default;
+  border-radius: 50%;
+}
+
+.vb-ball.is-live {
+  cursor: pointer;
+}
+
+.vb-ball.is-live:hover,
+.vb-ball.is-live:focus-visible {
+  outline: none;
+}
+
+.vb-ball.is-live img {
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+}
+
+.vb-ball.is-live:hover img,
+.vb-ball.is-live:focus-visible img {
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45)) brightness(1.08);
+}
+
+.vb-ball:disabled {
+  cursor: default;
+}
+
+.vb-ball img {
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.vb-miss {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  width: min(90vw, 20rem);
+  padding: 1.4rem 1.25rem 1.25rem;
+  border-radius: 18px;
+  background: rgba(17, 21, 30, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  text-align: center;
+  color: #e8eef7;
+}
+
+.vb-miss__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fda4af;
+}
+
+.vb-miss__score {
+  margin: 0 0 0.75rem;
+  color: rgba(232, 238, 247, 0.85);
+}
+
+.vb-miss__score strong {
+  color: #5eead4;
+}
+
+.vb-miss__note {
+  margin: 0 0 1.15rem;
+  padding: 0 0.25rem;
+  color: rgba(232, 238, 247, 0.9);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  animation: vb-note-pop 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes vb-note-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.vb-miss__actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.vb-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8eef7;
+  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.vb-btn:hover,
+.vb-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+.vb-btn--primary {
+  border-color: rgba(94, 234, 212, 0.45);
+  background: rgba(94, 234, 212, 0.16);
+  color: #5eead4;
+}
+
+.vb-btn--primary:hover,
+.vb-btn--primary:focus-visible {
+  background: rgba(94, 234, 212, 0.26);
+}
+
+@media (max-width: 640px) {
+  .vb-ball {
+    width: 128px !important;
+    height: 128px !important;
+  }
+
+  .vb-ball img {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  .vb-hint {
+    top: 3.8rem;
+    font-size: 0.8rem;
+  }
+}
