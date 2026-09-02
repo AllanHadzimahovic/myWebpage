@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
  * Lazy-loads a Unity WebGL build in an iframe.
@@ -8,6 +8,26 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
   const [started, setStarted] = useState(false)
   const [available, setAvailable] = useState(null) // null = checking, true/false
   const [fullscreen, setFullscreen] = useState(false)
+  const iframeRef = useRef(null)
+
+  const nudgeUnity = useCallback(() => {
+    const iframe = iframeRef.current
+    if (!iframe) return
+
+    const ping = () => {
+      try {
+        iframe.contentWindow?.postMessage({ type: 'unity-fit' }, '*')
+        iframe.contentWindow?.focus()
+        iframe.contentWindow?.document?.getElementById('unity-canvas')?.focus()
+      } catch {
+        // Cross-origin would throw; same-origin Unity build does not.
+      }
+    }
+
+    requestAnimationFrame(() => requestAnimationFrame(ping))
+    window.setTimeout(ping, 50)
+    window.setTimeout(ping, 200)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -50,6 +70,11 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [fullscreen])
+
+  useEffect(() => {
+    if (!started) return undefined
+    nudgeUnity()
+  }, [fullscreen, started, nudgeUnity])
 
   const start = useCallback(() => {
     if (available) setStarted(true)
@@ -119,10 +144,12 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
           </button>
         ) : (
           <iframe
+            ref={iframeRef}
             src={src}
             title={title}
             allow="fullscreen; gamepad; autoplay"
             allowFullScreen
+            onLoad={nudgeUnity}
           />
         )}
       </div>

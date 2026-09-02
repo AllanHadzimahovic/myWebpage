@@ -52,19 +52,23 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/RealBalloons.loader.js";
+      var loaderUrl = buildUrl + "/Webbuild(Allanpart5).loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/RealBalloons.data",
-        frameworkUrl: buildUrl + "/RealBalloons.framework.js",
-        codeUrl: buildUrl + "/RealBalloons.wasm",
+        dataUrl: buildUrl + "/Webbuild(Allanpart5).data",
+        frameworkUrl: buildUrl + "/Webbuild(Allanpart5).framework.js",
+        codeUrl: buildUrl + "/Webbuild(Allanpart5).wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "Real Balloons",
-        productVersion: "0.1.3-nocache",
+        productVersion: "0.1.0",
         showBanner: unityShowBanner,
-        // Avoid stale IndexedDB caches from earlier builds (common OOB crash cause)
-        cacheControl: function (url) { return "no-store"; },
+        // Keep the WebGL backbuffer at the canvas width/height attributes.
+        // Otherwise Unity follows getBoundingClientRect(); a fullscreen layout
+        // pass can report 0x0 and the view stays the canvas CSS color (brown)
+        // until the next mouse event.
+        matchWebGLToCanvasSize: false,
+        devicePixelRatio: 1,
       };
 
       // By default, Unity keeps WebGL canvas render target size matched with
@@ -104,31 +108,43 @@
         canvas.style.height = "600px";
       }
 
+      // Portfolio panel is ~760px; Unity's canvas is 960px. Scale the whole
+      // player to fit the iframe so the sides are not cropped (looks zoomed-in).
+      var unityContainer = document.querySelector("#unity-container");
+      var unityFooter = document.querySelector("#unity-footer");
+      var embedded = window.parent !== window;
+      if (embedded && unityFooter) unityFooter.style.display = "none";
+      function fitUnityToWindow() {
+        if (!unityContainer.classList.contains("unity-desktop")) return;
+        var availW = window.innerWidth;
+        var availH = window.innerHeight;
+        if (availW < 8 || availH < 8) return;
+        var gameW = 960;
+        var gameH = 600;
+        var footerH = unityFooter && unityFooter.style.display !== "none" ? unityFooter.offsetHeight : 0;
+        var scale = Math.min(availW / gameW, availH / (gameH + footerH), 1);
+        if (!isFinite(scale) || scale <= 0) return;
+        canvas.style.width = (gameW * scale) + "px";
+        canvas.style.height = (gameH * scale) + "px";
+        unityContainer.style.transform = "translate(-50%, -50%)";
+      }
+      window.addEventListener("resize", fitUnityToWindow);
+      window.addEventListener("message", function (event) {
+        if (!event.data || event.data.type !== "unity-fit") return;
+        fitUnityToWindow();
+        canvas.focus();
+        window.dispatchEvent(new Event("resize"));
+      });
+      if (typeof ResizeObserver === "function") {
+        new ResizeObserver(fitUnityToWindow).observe(document.documentElement);
+      }
+      fitUnityToWindow();
+
       document.querySelector("#unity-loading-bar").style.display = "block";
 
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
-        function clearUnityCaches() {
-          // Delete IndexedDB DBs Unity may have used for .data caching / IDBFS
-          if (!window.indexedDB || !indexedDB.databases) return Promise.resolve();
-          return indexedDB.databases().then(function (dbs) {
-            return Promise.all((dbs || []).map(function (db) {
-              var name = db && db.name;
-              if (!name) return;
-              var lower = name.toLowerCase();
-              if (lower.indexOf("unity") !== -1 || lower.indexOf("idbfs") !== -1 || lower.indexOf("real balloon") !== -1 || lower.indexOf("/idbfs") !== -1) {
-                console.warn("Deleting IndexedDB:", name);
-                return new Promise(function (resolve) {
-                  var req = indexedDB.deleteDatabase(name);
-                  req.onsuccess = req.onerror = req.onblocked = function () { resolve(); };
-                });
-              }
-            }));
-          }).catch(function () { /* older browsers */ });
-        }
-
-        clearUnityCaches().then(function () {
         createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
               }).then((unityInstance) => {
@@ -138,17 +154,8 @@
                 };
 
               }).catch((message) => {
-                console.error(message);
-                var warningBanner = document.querySelector("#unity-warning");
-                var div = document.createElement("div");
-                div.style.cssText = "background:#b00020;color:#fff;padding:12px;white-space:pre-wrap;text-align:left;max-height:50vh;overflow:auto;font:12px/1.4 monospace;";
-                div.textContent = String(message);
-                warningBanner.appendChild(div);
-                warningBanner.style.display = "block";
-                var first = String(message).split("\n").find(function (l) { return l && !l.startsWith("    at"); }) || String(message).slice(0, 300);
-                alert(first);
+                alert(message);
               });
-        });
             };
 
       document.body.appendChild(script);

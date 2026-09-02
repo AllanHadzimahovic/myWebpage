@@ -81,17 +81,15 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(42%, 280px);
+  width: min(52%, 360px);
   height: auto;
   aspect-ratio: 1;
-  object-fit: cover;
-  object-position: center 18%;
-  border-radius: 50%;
+  object-fit: contain;
+  background: transparent;
+  border-radius: 0;
   transform: translate(-50%, -50%);
-  box-shadow:
-    0 0 0 3px rgba(94, 234, 212, 0.35),
-    0 0 48px rgba(94, 234, 212, 0.18),
-    0 24px 60px rgba(0, 0, 0, 0.55);
+  /* White silhouette + shadow are baked into the PNG (die-cut sticker). */
+  box-shadow: none;
   z-index: 2;
 }
 
@@ -158,6 +156,86 @@
 .project-marker.is-sticker:focus-visible {
   box-shadow: none;
   filter: brightness(1.06);
+}
+
+.project-marker.is-shaking,
+.project-marker.is-shaking:hover,
+.project-marker.is-shaking:focus-visible {
+  z-index: 8;
+  animation: sticker-shake 0.65s ease-in-out;
+  filter: none;
+}
+
+@keyframes sticker-shake {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--tilt));
+  }
+  12% {
+    transform: translate(calc(-50% - 8px), -50%) rotate(calc(var(--tilt) - 12deg));
+  }
+  24% {
+    transform: translate(calc(-50% + 8px), -50%) rotate(calc(var(--tilt) + 12deg));
+  }
+  36% {
+    transform: translate(calc(-50% - 7px), -50%) rotate(calc(var(--tilt) - 9deg));
+  }
+  48% {
+    transform: translate(calc(-50% + 7px), -50%) rotate(calc(var(--tilt) + 9deg));
+  }
+  60% {
+    transform: translate(calc(-50% - 4px), -50%) rotate(calc(var(--tilt) - 5deg));
+  }
+  72% {
+    transform: translate(calc(-50% + 4px), -50%) rotate(calc(var(--tilt) + 4deg));
+  }
+  86% {
+    transform: translate(calc(-50% - 2px), -50%) rotate(calc(var(--tilt) - 2deg));
+  }
+}
+
+.phone-reveal {
+  position: absolute;
+  z-index: 9;
+  left: clamp(7.5rem, var(--phone-x), calc(100vw - 7.5rem));
+  transform: translate(-50%, calc(var(--sticker-size, 108px) * 0.52 + 10px));
+  width: 13.5rem;
+  box-sizing: border-box;
+  padding: 0.6rem 0.7rem 0.7rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(20, 24, 34, 0.94);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.phone-reveal label {
+  display: block;
+  margin: 0 0 0.35rem;
+  color: #5eead4;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.phone-reveal input {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: #0b0d12;
+  color: #e8eaef;
+  font: inherit;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  padding: 0.45rem 0.6rem;
+  text-align: center;
+}
+
+.phone-reveal input:focus {
+  outline: none;
+  border-color: rgba(94, 234, 212, 0.55);
 }
 
 .flying-icon {
@@ -248,8 +326,8 @@
 .project-panel__close {
   position: fixed;
   top: 1.25rem;
-  right: 1.25rem;
-  left: auto;
+  left: 1.25rem;
+  right: auto;
   z-index: 61;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(20, 24, 34, 0.9);
@@ -270,7 +348,7 @@
 
 .project-panel__header {
   margin-bottom: 2rem;
-  padding-right: 5rem;
+  padding-right: 10rem;
 }
 
 .project-panel__eyebrow {
@@ -643,7 +721,10 @@
 .unity-player__frame {
   position: relative;
   width: 100%;
-  height: min(70svh, 640px);
+  height: auto;
+  min-height: 220px;
+  aspect-ratio: 16 / 10;
+  max-height: min(70svh, 600px);
   border-radius: 16px;
   overflow: hidden;
   background:
@@ -655,6 +736,8 @@
 
 .unity-player.is-fullscreen .unity-player__frame {
   height: calc(100svh - 5.5rem);
+  aspect-ratio: auto;
+  max-height: none;
   border-radius: 12px;
 }
 
@@ -1185,7 +1268,7 @@
 
 @media (max-width: 640px) {
   .portrait {
-    width: min(48%, 220px);
+    width: min(62%, 260px);
   }
 
   .project-marker {
@@ -1197,12 +1280,12 @@
   }
 
   .project-panel__header {
-    padding-right: 4.5rem;
+    padding-right: 8.5rem;
   }
 
   .project-panel__close {
-    right: 1rem;
-    left: auto;
+    left: 1rem;
+    right: auto;
     top: 1rem;
   }
 }

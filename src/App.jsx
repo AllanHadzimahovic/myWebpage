@@ -5,10 +5,19 @@ import ProjectPanel from './ProjectPanel.jsx'
 import VolleyballGame from './VolleyballGame.jsx'
 import './App.css'
 
-const CORNER_SIZE = 64
+const CORNER_SIZE = 128
 const CORNER_INSET = 20
 const CORNER_GAP = 10
 const CLOSE_MS = 420
+/** Leave room for the top-left Close control so grouped stickers stay on-screen. */
+const CLOSE_CLEARANCE = 110
+
+function settledCornerSize(count) {
+  const gaps = Math.max(0, count - 1) * CORNER_GAP
+  const available = window.innerWidth - CORNER_INSET - CLOSE_CLEARANCE - gaps
+  const maxEach = Math.floor(available / Math.max(count, 1))
+  return Math.max(56, Math.min(CORNER_SIZE, maxEach))
+}
 
 function resolveContentId(id) {
   const project = projects.find((item) => item.id === id)
@@ -30,8 +39,12 @@ function App() {
   const [flySettled, setFlySettled] = useState(false)
   const [panelOpen, setPanelOpen] = useState(false)
   const [volleyballOpen, setVolleyballOpen] = useState(false)
+  const [phoneShakeId, setPhoneShakeId] = useState(null)
+  const [phoneReveal, setPhoneReveal] = useState(null)
   const markerRefs = useRef({})
   const closeTimer = useRef(null)
+  const phoneShakeTimer = useRef(null)
+  const phoneInputRef = useRef(null)
 
   const active = projects.find((project) => project.id === activeId) ?? null
   const isOpen = Boolean(activeId) || volleyballOpen
@@ -41,8 +54,21 @@ function App() {
   useEffect(() => {
     return () => {
       if (closeTimer.current) clearTimeout(closeTimer.current)
+      if (phoneShakeTimer.current) clearTimeout(phoneShakeTimer.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (!phoneReveal) return undefined
+    phoneInputRef.current?.focus()
+    phoneInputRef.current?.select()
+
+    function onKeyDown(event) {
+      if (event.key === 'Escape') setPhoneReveal(null)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [phoneReveal])
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -64,7 +90,35 @@ function App() {
     }
   }, [isOpen, volleyballOpen])
 
+  function startPhoneShake(id) {
+    setPhoneShakeId(id)
+    if (phoneShakeTimer.current) clearTimeout(phoneShakeTimer.current)
+    phoneShakeTimer.current = setTimeout(() => {
+      setPhoneShakeId((current) => (current === id ? null : current))
+      phoneShakeTimer.current = null
+    }, 650)
+  }
+
+  function revealPhone(project) {
+    setPhoneReveal({
+      id: project.id,
+      number: project.phoneNumber,
+      x: project.x,
+      y: project.y,
+      size: project.size,
+    })
+    if (phoneShakeId === project.id) {
+      setPhoneShakeId(null)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => startPhoneShake(project.id))
+      })
+      return
+    }
+    startPhoneShake(project.id)
+  }
+
   function openProject(clickedId) {
+    setPhoneReveal(null)
     if (closeTimer.current) {
       clearTimeout(closeTimer.current)
       closeTimer.current = null
@@ -72,6 +126,7 @@ function App() {
 
     const contentId = resolveContentId(clickedId)
     const group = getGroupProjects(contentId)
+    const size = settledCornerSize(group.length)
 
     const flights = group.map((project) => {
       const el = markerRefs.current[project.id]
@@ -80,6 +135,7 @@ function App() {
         id: project.id,
         icon: project.icon,
         sticker: Boolean(project.sticker),
+        size,
         from: rect
           ? {
               top: rect.top,
@@ -89,9 +145,9 @@ function App() {
             }
           : {
               top: CORNER_INSET,
-              left: window.innerWidth - CORNER_INSET - CORNER_SIZE,
-              width: CORNER_SIZE,
-              height: CORNER_SIZE,
+              left: window.innerWidth - CORNER_INSET - size,
+              width: size,
+              height: size,
             },
       }
     })
@@ -124,14 +180,15 @@ function App() {
     <main
       className={`landing${volleyballOpen ? ' is-volleyball' : isContactOpen ? ' is-contact' : isOpen ? ' is-dimmed' : ''}`}
       aria-label="Portfolio landing"
+      onClick={() => setPhoneReveal(null)}
     >
       <div className="stage" aria-hidden={isOpen}>
         <img
           className="portrait"
-          src={assetUrl('/me.jpg')}
+          src={assetUrl('/me.png')}
           alt="Allan Hadzimahovic"
-          width={320}
-          height={320}
+          width={360}
+          height={360}
         />
       </div>
 
@@ -142,26 +199,32 @@ function App() {
         const label = project.markerTitle || project.title
         const externalUrl = project.externalUrl
         const isVolleyball = project.miniGame === 'volleyball'
+        const isPhone = Boolean(project.phoneNumber)
+        const skipPanel = Boolean(externalUrl || isVolleyball || isPhone)
         return (
           <button
             key={project.id}
             type="button"
-            className={`project-marker${sticker ? ' is-sticker' : ''}${isActive ? ' is-active' : ''}`}
+            className={`project-marker${sticker ? ' is-sticker' : ''}${isActive ? ' is-active' : ''}${phoneShakeId === project.id ? ' is-shaking' : ''}`}
             title={
               externalUrl
                 ? `${label} (opens in new tab)`
                 : isVolleyball
                   ? `${label} mini-game`
-                  : label
+                  : isPhone
+                    ? `${label} number`
+                    : label
             }
             aria-label={
               externalUrl
                 ? `Open ${label} profile`
                 : isVolleyball
                   ? `Play ${label} mini-game`
-                  : `Open ${label}`
+                  : isPhone
+                    ? `Show ${label} number`
+                    : `Open ${label}`
             }
-            aria-expanded={externalUrl || isVolleyball ? undefined : isActive}
+            aria-expanded={skipPanel ? undefined : isActive}
             disabled={isOpen && !isActive && !externalUrl}
             ref={(node) => {
               markerRefs.current[project.id] = node
@@ -173,13 +236,20 @@ function App() {
               height: project.size,
               '--tilt': `${tilt}deg`,
             }}
-            onClick={() => {
+            onClick={(event) => {
+              event.stopPropagation()
               if (externalUrl) {
+                setPhoneReveal(null)
                 window.open(externalUrl, '_blank', 'noopener,noreferrer')
                 return
               }
               if (isVolleyball) {
+                setPhoneReveal(null)
                 setVolleyballOpen(true)
+                return
+              }
+              if (isPhone) {
+                revealPhone(project)
                 return
               }
               openProject(project.id)
@@ -191,6 +261,7 @@ function App() {
       })}
 
       {flyGroup.map((flight, index) => {
+        const size = flight.size ?? CORNER_SIZE
         const style = !flySettled
           ? {
               top: flight.from.top,
@@ -200,9 +271,9 @@ function App() {
             }
           : {
               top: CORNER_INSET,
-              left: `calc(100vw - ${CORNER_INSET + CORNER_SIZE + index * (CORNER_SIZE + CORNER_GAP)}px)`,
-              width: CORNER_SIZE,
-              height: CORNER_SIZE,
+              left: `calc(100vw - ${CORNER_INSET + size + index * (size + CORNER_GAP)}px)`,
+              width: size,
+              height: size,
             }
 
         return (
@@ -216,6 +287,29 @@ function App() {
           </div>
         )
       })}
+
+      {phoneReveal ? (
+        <div
+          className="phone-reveal"
+          style={{
+            top: `${phoneReveal.y}%`,
+            '--phone-x': `${phoneReveal.x}%`,
+            '--sticker-size': `${phoneReveal.size}px`,
+          }}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <label htmlFor="phone-reveal-number">Give me a call</label>
+          <input
+            id="phone-reveal-number"
+            ref={phoneInputRef}
+            type="text"
+            readOnly
+            value={phoneReveal.number}
+            aria-label="Give me a call"
+            onFocus={(event) => event.target.select()}
+          />
+        </div>
+      ) : null}
 
       <ProjectPanel project={active} open={panelOpen} onClose={closeProject} />
 

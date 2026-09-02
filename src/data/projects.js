@@ -9,6 +9,7 @@
  * gallerySecondaryHeading: optional h2 for that section (default "Partners").
  * galleries: [{ heading, images, fit? }] — extra named carousels after gallerySecondary.
  *   fit: 'portrait' — taller frame for tall slides (Scrum pages, etc.).
+ * phoneNumber — skip panel; shake the sticker and show this number in a text box.
  */
 export const projects = [
   {
@@ -144,7 +145,7 @@ export const projects = [
     unityWebGL: {
       title: 'Real Balloons',
       // Cache-bust so browsers don't reuse an old compressed (.br) index.html
-      src: '/games/unity/index.html?v=nocache-4',
+      src: '/games/unity/index.html?v=fit2',
       note: 'Works best on desktop Chrome or Edge. Click the game canvas after it loads if keyboard/mouse input feels stuck.',
     },
     pdfs: [],
@@ -518,5 +519,18 @@ export const projects = [
     ],
     pdfs: [],
     links: [],
+  },
+  {
+    id: 'project-18',
+    title: 'Phone',
+    markerTitle: 'Phone',
+    icon: '/projects/project-18.png',
+    sticker: true,
+    x: 31,
+    y: 38,
+    size: 108,
+    rotate: -14,
+    // Landing shake + text box — skips ProjectPanel.
+    phoneNumber: '+45 42319931',
   },
 ]
