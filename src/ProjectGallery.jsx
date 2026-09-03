@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { assetUrl } from './assetUrl.js'
+import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
 
 function isYoutubeItem(item) {
   return item?.type === 'youtube' || Boolean(item?.youtubeId)
@@ -11,6 +12,7 @@ function slideKey(item, i) {
 }
 
 export default function ProjectGallery({ images, title, heading = 'Gallery', fit }) {
+  const { lowPower } = useLowPower()
   const [index, setIndex] = useState(0)
   const total = images?.length ?? 0
   const safeIndex = total ? Math.min(index, total - 1) : 0
@@ -69,15 +71,24 @@ export default function ProjectGallery({ images, title, heading = 'Gallery', fit
       >
         <div className={frameClass}>
           {showingVideo ? (
-            <iframe
-              key={current.youtubeId}
-              className="project-gallery__video"
-              src={`https://www.youtube.com/embed/${current.youtubeId}`}
-              title={current.alt || `${title} video`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              loading="lazy"
-            />
+            lowPower ? (
+              <LowPowerMediaNote
+                href={`https://www.youtube.com/watch?v=${current.youtubeId}`}
+                hrefLabel="Open on YouTube"
+              >
+                Video embeds are paused in low-power mode.
+              </LowPowerMediaNote>
+            ) : (
+              <iframe
+                key={current.youtubeId}
+                className="project-gallery__video"
+                src={`https://www.youtube.com/embed/${current.youtubeId}`}
+                title={current.alt || `${title} video`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+              />
+            )
           ) : (
             <img
               key={current.src}
@@ -87,6 +98,10 @@ export default function ProjectGallery({ images, title, heading = 'Gallery', fit
             />
           )}
         </div>
+
+        {current.caption || current.text ? (
+          <p className="project-gallery__caption">{current.caption || current.text}</p>
+        ) : null}
 
         <div className="project-gallery__controls">
           <button type="button" className="project-gallery__nav" onClick={() => go(-1)} aria-label="Previous slide">

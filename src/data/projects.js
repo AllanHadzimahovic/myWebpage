@@ -3,13 +3,19 @@
  * sticker: true → die-cut PNG with baked white silhouette (no rounded CSS frame).
  * rotate: degrees of tilt (optional).
  * x/y: percent of the full landing viewport.
- * gallery: [{ src, alt? } | { type:'youtube', youtubeId, alt? }] — primary carousel.
+ * stills: [{ src, alt? }] — static images in a row (e.g. two photos above a PDF).
+ * hideMarker: true — content-only entry (not drawn as a landing sticker).
+ * gallery: [{ src, alt?, caption? } | { type:'youtube', youtubeId, alt?, caption? }] — primary carousel.
+ *   caption — text shown under the current slide.
+ * favorites: [{ title, items: [string | { title, url }] }] — boxed lists (About Me, etc).
  * galleryHeading: optional h2 for the primary gallery (default "Gallery").
  * gallerySecondary: same shape as gallery; rendered below primary (above Documents).
  * gallerySecondaryHeading: optional h2 for that section (default "Partners").
  * galleries: [{ heading, images, fit? }] — extra named carousels after gallerySecondary.
  *   fit: 'portrait' — taller frame for tall slides (Scrum pages, etc.).
  * phoneNumber — skip panel; shake the sticker and show this number in a text box.
+ * languageGroups: [{ heading, items: [{ title, src, text }], credit? }] — labeled icon grids; click opens a text box.
+ * languageStickers / languageStickersHeading — older single-grid shape (still supported).
  */
 export const projects = [
   {
@@ -25,6 +31,16 @@ export const projects = [
     description:
       'Read the full case below — problem, approach, and outcomes for the LEGO Ideas project.',
     youtubeId: '',
+    stills: [
+      {
+        src: '/projects/lego/01.jpg',
+        alt: 'Allan with a LEGO Game Boy set, a Danish flag, and a card that says Du får ny LEGO',
+      },
+      {
+        src: '/projects/lego/02.jpg',
+        alt: 'Finished LEGO Game Boy, Vespa scooter, sports car, and a Prusa rubber duck on a table',
+      },
+    ],
     pdfs: [
       {
         title: 'DOT LEGO Ideas case',
@@ -41,8 +57,8 @@ export const projects = [
     title: 'Volleyball',
     icon: '/projects/project-2.png',
     sticker: true,
-    x: 86,
-    y: 12,
+    x: 72,
+    y: 22,
     size: 108,
     rotate: 8,
     // Landing mini-game — skips ProjectPanel (see VolleyballGame.jsx).
@@ -155,6 +171,31 @@ export const projects = [
       src: '/games/unity/index.html?v=fit2',
       note: 'Works best on desktop Chrome or Edge. Click the game canvas after it loads if keyboard/mouse input feels stuck.',
     },
+    codeRepo: {
+      title: 'GitHub repository',
+      url: 'https://github.com/AllanHadzimahovic/RealBalloons',
+      icon: '/projects/project-15.png',
+    },
+    code: [
+      { title: 'GameStateMachine.cs', url: '/files/code/real-balloons/GameStateMachine.cs', language: 'csharp' },
+      { title: 'GlobalInputManager.cs', url: '/files/code/real-balloons/GlobalInputManager.cs', language: 'csharp' },
+      { title: 'LevelManager.cs', url: '/files/code/real-balloons/LevelManager.cs', language: 'csharp' },
+      { title: 'BuildManager.cs', url: '/files/code/real-balloons/BuildManager.cs', language: 'csharp' },
+      { title: 'Character_Controller.cs', url: '/files/code/real-balloons/Character_Controller.cs', language: 'csharp' },
+      { title: 'HomeScript.cs', url: '/files/code/real-balloons/HomeScript.cs', language: 'csharp' },
+      { title: 'PlaneScript.cs', url: '/files/code/real-balloons/PlaneScript.cs', language: 'csharp' },
+      { title: 'EnemyScript.cs', url: '/files/code/real-balloons/EnemyScript.cs', language: 'csharp' },
+      { title: 'EnemySpawner.cs', url: '/files/code/real-balloons/EnemySpawner.cs', language: 'csharp' },
+      { title: 'Turret.cs', url: '/files/code/real-balloons/Turret.cs', language: 'csharp' },
+      { title: 'Bullet.cs', url: '/files/code/real-balloons/Bullet.cs', language: 'csharp' },
+      { title: 'AttackSphereScript.cs', url: '/files/code/real-balloons/AttackSphereScript.cs', language: 'csharp' },
+      { title: 'WallsOnTrigger.cs', url: '/files/code/real-balloons/WallsOnTrigger.cs', language: 'csharp' },
+      { title: 'ChangeColor.cs', url: '/files/code/real-balloons/ChangeColor.cs', language: 'csharp' },
+      { title: 'hagScript.cs', url: '/files/code/real-balloons/hagScript.cs', language: 'csharp' },
+      { title: 'StartMenuScript.cs', url: '/files/code/real-balloons/StartMenuScript.cs', language: 'csharp' },
+      { title: 'PauseMenuEvents.cs', url: '/files/code/real-balloons/PauseMenuEvents.cs', language: 'csharp' },
+      { title: 'GameOverMenuScript.cs', url: '/files/code/real-balloons/GameOverMenuScript.cs', language: 'csharp' },
+    ],
     pdfs: [],
     links: [],
   },
@@ -515,14 +556,141 @@ export const projects = [
     y: 52,
     size: 120,
     rotate: -5,
-    summary: 'Languages I work with — SQL, JavaScript, Python, and C++.',
-    description: 'The rubber duck keeps me company while debugging. Tap a language sticker below to learn more later.',
+    summary: 'Languages, applications, and project tools I work with.',
+    description: 'The rubber duck keeps me company while debugging. Tap a logo to read more.',
     youtubeId: '',
-    languageStickers: [
-      { title: 'SQL', src: '/projects/languages/sql.png' },
-      { title: 'JavaScript', src: '/projects/languages/javascript.png' },
-      { title: 'Python', src: '/projects/languages/python.png' },
-      { title: 'C++', src: '/projects/languages/cpp.png' },
+    languageGroups: [
+      {
+        heading: 'Programming languages',
+        credit: 'Language icons from Flaticon.',
+        items: [
+          {
+            title: 'SQL',
+            src: '/projects/languages/sql.png',
+            text: 'Structured Query Language — how I talk to relational databases. Select, join, and filter until the table actually answers the question.',
+          },
+          {
+            title: 'JSON',
+            src: '/projects/languages/json.png',
+            text: 'JavaScript Object Notation. The usual shape of API payloads and config files — nested objects and arrays that move data between services and the UI.',
+          },
+          {
+            title: 'C++',
+            src: '/projects/languages/cpp.png',
+            text: 'A systems language I used on hardware work, including Arduino firmware for the Chess Machine. Close to the metal, explicit about memory and control.',
+          },
+          {
+            title: 'Python',
+            src: '/projects/languages/python.png',
+            text: 'My go-to for scripts, data, and glue code. Fast to try an idea, then keep the parts that are worth shipping.',
+          },
+          {
+            title: 'Java',
+            src: '/projects/languages/java.png',
+            text: 'A strongly typed, object-oriented language for structured applications. Classes, packages, and a runtime that shows up across backends and tools.',
+          },
+          {
+            title: 'JavaScript',
+            src: '/projects/languages/javascript.png',
+            text: 'The language of the web. I use it for interactive pages, browser logic, and the front-end of this portfolio.',
+          },
+          {
+            title: 'C#',
+            src: '/projects/languages/csharp.png',
+            text: 'The language behind the Real Balloons Unity game — gameplay, input, menus, and the scripts that hold a scene together.',
+          },
+        ],
+      },
+      {
+        heading: 'Applications',
+        items: [
+          {
+            title: 'Azure',
+            src: '/projects/languages/azure.png',
+            text: 'Microsoft’s cloud. I use it for services, identity, storage, and the rest of the stack that sits behind a project.',
+          },
+          {
+            title: 'Power BI',
+            src: '/projects/languages/power-bi.png',
+            text: 'Reports and dashboards. Take a table and turn it into something a stakeholder can actually read in a meeting.',
+          },
+          {
+            title: 'Data Factory',
+            src: '/projects/languages/data-factory.png',
+            text: 'Azure Data Factory — pipelines that move and transform data between systems on a schedule, not by hand.',
+          },
+          {
+            title: 'Power Automate',
+            src: '/projects/languages/power-automate.png',
+            text: 'Flows that take the copy-paste out of recurring work across Microsoft 365, approvals, and notifications.',
+          },
+          {
+            title: 'Claude Code',
+            src: '/projects/languages/claude-code.png',
+            text: 'Anthropic’s coding agent in the terminal. I use it for longer refactors and edits that need the whole repo in view.',
+          },
+          {
+            title: 'Grok Bot',
+            src: '/projects/languages/grok-bot.png',
+            text: 'xAI’s Grok in the build loop — scaffolding, stickers, and shipping this portfolio.',
+          },
+          {
+            title: 'Docker',
+            src: '/projects/languages/docker.png',
+            text: 'Containers so the app that runs on my machine runs the same on the next one.',
+          },
+          {
+            title: 'Kubernetes',
+            src: '/projects/languages/kubernetes.png',
+            text: 'Orchestration for those containers when one box isn’t enough — deploy, scale, and keep services up.',
+          },
+          {
+            title: 'VS Code',
+            src: '/projects/languages/vscode.png',
+            text: 'Daily editor. The place the code actually gets written, debugged, and committed.',
+          },
+          {
+            title: 'Unity',
+            src: '/projects/languages/unity-app.png',
+            text: 'Game engine behind Real Balloons — scenes, physics, UI, and the WebGL build on this site.',
+          },
+          {
+            title: 'GitHub',
+            src: '/projects/languages/github-app.png',
+            text: 'Where the repos live — issues, history, and this portfolio at github.com/AllanHadzimahovic.',
+          },
+        ],
+      },
+      {
+        heading: 'Project Management',
+        items: [
+          {
+            title: 'ClickUp',
+            src: '/projects/languages/clickup.png',
+            text: 'Tasks, docs, and a place to park the work so it doesn’t live only in a chat thread.',
+          },
+          {
+            title: 'Linear',
+            src: '/projects/languages/linear.png',
+            text: 'Issue tracking with a fast, keyboard-first workflow. Cycles, priorities, and a board that stays out of the way.',
+          },
+          {
+            title: 'Jira',
+            src: '/projects/languages/jira.png',
+            text: 'Classic software delivery board — epics, sprints, and tickets when the team already lives in Atlassian.',
+          },
+          {
+            title: 'Microsoft 365',
+            src: '/projects/languages/microsoft-365.png',
+            text: 'Outlook, Teams, Word, Excel — the office suite the day-to-day work runs through.',
+          },
+          {
+            title: 'Google Workspace',
+            src: '/projects/languages/google-workspace.png',
+            text: 'Docs, Drive, Calendar, Meet — the Google side of sharing files and getting people in the same room.',
+          },
+        ],
+      },
     ],
     pdfs: [],
     links: [],
@@ -539,5 +707,80 @@ export const projects = [
     rotate: -14,
     // Landing shake + text box — skips ProjectPanel.
     phoneNumber: '+45 42319931',
+  },
+  {
+    id: 'about-me',
+    title: 'About Me',
+    hideMarker: true,
+    summary: '',
+    description: '',
+    galleryHeading: 'Photos',
+    gallery: [],
+    favorites: [
+      {
+        title: 'Books',
+        items: [
+          'Factfullness',
+          'Eragon',
+          "Ranger's Apprentice",
+          'The Subtle Art of not Giving a F*ck',
+          'Jytte Vender Tilbage',
+          'Alt det ingen har fortalt os om Atomkraft',
+          'A little life',
+          'Stolen Focus',
+          'Jeg anerkender ikke længere jeres autoritet',
+        ],
+      },
+      {
+        title: 'Games',
+        items: [
+          'Silksong',
+          'Gran Turismo',
+          'Trackmania',
+          'Mariokart',
+          'SuperMario Smashbrothers',
+          'Tears of Kingdom',
+          'Breath of the Wild',
+          'Pokemon Shining Pearl',
+          'GameBoy Mario Tennis',
+          'Lego Star Wars',
+          'Wii Sports',
+          'Overcooked',
+          'Black Ops',
+        ],
+      },
+      {
+        title: 'Websites',
+        items: [
+          { title: 'LEGO Ideas', url: 'https://ideas.lego.com/' },
+          { title: 'lowtechgazine', url: 'https://solar.lowtechmagazine.com/' },
+          { title: 'Forensic Architecture', url: 'https://forensic-architecture.org/' },
+          { title: 'Pentagon Pizza Index', url: 'https://www.pizzint.watch/' },
+          { title: 'The Odin Project', url: 'https://www.theodinproject.com/' },
+          { title: 'CS50', url: 'https://cs50.harvard.edu/' },
+          { title: 'GitBranching', url: 'https://learngitbranching.js.org/' },
+          { title: 'Youtube', url: 'https://www.youtube.com/' },
+          { title: 'Tokenizer', url: 'https://platform.openai.com/tokenizer' },
+          { title: 'European alternatives', url: 'https://european-alternatives.eu/' },
+          { title: 'Code Carbon', url: 'https://codecarbon.io/' },
+        ],
+      },
+      {
+        title: 'Activities',
+        items: [
+          'Volleyball',
+          'Badminton',
+          'Cycling',
+          'Tennis',
+          'Any kind of team sports (so not running!)',
+          'Board games (Jaws of the Lion & Citadel)',
+          'Intercultural Exchange (Youth Exchanges)',
+          'Assembling Ikea furniture :)',
+          'LEGO',
+        ],
+      },
+    ],
+    pdfs: [],
+    links: [],
   },
 ]

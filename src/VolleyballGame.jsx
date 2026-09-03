@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
 import './VolleyballGame.css'
 
 const COUNTDOWN_MS = 1000
@@ -20,6 +21,7 @@ function sideFromX(x) {
 }
 
 export default function VolleyballGame({ onClose, ballSrc }) {
+  const { lowPower } = useLowPower()
   const [phase, setPhase] = useState('countdown') // countdown | falling | crossing | missed
   const [count, setCount] = useState(3)
   const [score, setScore] = useState(0)
@@ -200,10 +202,14 @@ export default function VolleyballGame({ onClose, ballSrc }) {
   }, [clearMotion, setHitEnabled])
 
   useEffect(() => {
+    if (lowPower) {
+      clearMotion()
+      return undefined
+    }
     runCountdown()
     return clearMotion
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [lowPower])
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -212,6 +218,21 @@ export default function VolleyballGame({ onClose, ballSrc }) {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [onClose])
+
+  if (lowPower) {
+    return (
+      <div className="vb-overlay" role="dialog" aria-modal="true" aria-label="Volleyball mini-game paused">
+        <button type="button" className="vb-close" onClick={onClose} aria-label="Close volleyball game">
+          ×
+        </button>
+        <div className="vb-miss">
+          <LowPowerMediaNote>
+            The volleyball mini-game is paused in low-power mode so the display can skip animation.
+          </LowPowerMediaNote>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="vb-overlay" role="dialog" aria-modal="true" aria-label="Volleyball mini-game">

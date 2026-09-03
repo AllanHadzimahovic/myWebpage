@@ -3,6 +3,9 @@ import { projects } from './data/projects.js'
 import { assetUrl } from './assetUrl.js'
 import ProjectPanel from './ProjectPanel.jsx'
 import VolleyballGame from './VolleyballGame.jsx'
+import NameIntro from './NameIntro.jsx'
+import UsageMeter from './UsageMeter.jsx'
+import { readLowPower, useLowPower } from './lowPower.jsx'
 import './App.css'
 
 const CORNER_SIZE = 128
@@ -11,10 +14,46 @@ const CORNER_GAP = 10
 const CLOSE_MS = 1040
 /** Leave room for the top-left Close control so grouped stickers stay on-screen. */
 const CLOSE_CLEARANCE = 110
+const POWER_SIZE_DESKTOP = 88
+const POWER_SIZE_MOBILE = 72
+const POWER_INSET = 16
+const POWER_GAP = 12
+const POSITIONS_KEY = 'sticker-positions'
+const DRAG_THRESHOLD_PX = 8
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value))
+}
+
+function loadSavedPositions() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(POSITIONS_KEY) || '')
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+    return parsed
+  } catch {
+    return {}
+  }
+}
+
+function savePositions(positions) {
+  try {
+    localStorage.setItem(POSITIONS_KEY, JSON.stringify(positions))
+  } catch {
+    // private mode / blocked storage
+  }
+}
+
+function powerStickerSize() {
+  return window.innerWidth <= 640 ? POWER_SIZE_MOBILE : POWER_SIZE_DESKTOP
+}
+
+function powerReserve() {
+  return POWER_INSET + powerStickerSize() + POWER_GAP
+}
 
 function settledCornerSize(count) {
   const gaps = Math.max(0, count - 1) * CORNER_GAP
-  const available = window.innerWidth - CORNER_INSET - CLOSE_CLEARANCE - gaps
+  const available = window.innerWidth - CORNER_INSET - CLOSE_CLEARANCE - powerReserve() - gaps
   const maxEach = Math.floor(available / Math.max(count, 1))
   return Math.max(56, Math.min(CORNER_SIZE, maxEach))
 }
@@ -34,6 +73,9 @@ function getGroupProjects(contentId) {
 }
 
 function App() {
+  const { lowPower, toggleLowPower } = useLowPower()
+  const [introOpen, setIntroOpen] = useState(() => !readLowPower())
+  const [introPlaying, setIntroPlaying] = useState(introOpen)
   const [activeId, setActiveId] = useState(null)
   const [flyGroup, setFlyGroup] = useState([])
   const [flySettled, setFlySettled] = useState(false)
@@ -41,10 +83,17 @@ function App() {
   const [volleyballOpen, setVolleyballOpen] = useState(false)
   const [phoneShakeId, setPhoneShakeId] = useState(null)
   const [phoneReveal, setPhoneReveal] = useState(null)
+  const [lowPowerNotice, setLowPowerNotice] = useState(false)
+  const [positions, setPositions] = useState(loadSavedPositions)
+  const [draggingId, setDraggingId] = useState(null)
   const markerRefs = useRef({})
+  const landingRef = useRef(null)
+  const dragRef = useRef(null)
+  const positionsRef = useRef(positions)
   const closeTimer = useRef(null)
   const phoneShakeTimer = useRef(null)
   const phoneInputRef = useRef(null)
+  positionsRef.current = positions
 
   const active = projects.find((project) => project.id === activeId) ?? null
   const isOpen = Boolean(activeId) || volleyballOpen
@@ -57,6 +106,8 @@ function App() {
       if (phoneShakeTimer.current) clearTimeout(phoneShakeTimer.current)
     }
   }, [])
+
+
 
   useEffect(() => {
     if (!phoneReveal) return undefined
@@ -90,6 +141,65 @@ function App() {
     }
   }, [isOpen, volleyballOpen])
 
+  function posOf(project) {
+    const saved = positions[project.id]
+    if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+      return { x: saved.x, y: saved.y }
+    }
+    return { x: project.x, y: project.y }
+  }
+
+  function startMarkerDrag(project, event) {
+    if (event.button != null && event.button !== 0) return
+    if (introPlaying && !lowPower) return
+    const landing = landingRef.current
+    if (!landing) return
+    const rect = landing.getBoundingClientRect()
+    if (rect.width < 2 || rect.height < 2) return
+    const current = posOf(project)
+    dragRef.current = {
+      id: project.id,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: current.x,
+      originY: current.y,
+      landingWidth: rect.width,
+      landingHeight: rect.height,
+      moved: false,
+    }
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // pointer capture is best-effort
+    }
+  }
+
+  function moveMarkerDrag(event) {
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    const dx = event.clientX - drag.startX
+    const dy = event.clientY - drag.startY
+    if (!drag.moved) {
+      if (Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return
+      drag.moved = true
+      setDraggingId(drag.id)
+      setPhoneReveal(null)
+      setPhoneShakeId(null)
+    }
+    event.preventDefault()
+    const x = clamp(drag.originX + (dx / drag.landingWidth) * 100, 5, 95)
+    const y = clamp(drag.originY + (dy / drag.landingHeight) * 100, 5, 95)
+    setPositions((prev) => ({ ...prev, [drag.id]: { x, y } }))
+  }
+
+  function endMarkerDrag(event) {
+    const drag = dragRef.current
+    if (!drag || (event && drag.pointerId !== event.pointerId)) return
+    if (drag.moved) savePositions(positionsRef.current)
+    setDraggingId(null)
+  }
+
   function startPhoneShake(id) {
     setPhoneShakeId(id)
     if (phoneShakeTimer.current) clearTimeout(phoneShakeTimer.current)
@@ -100,11 +210,12 @@ function App() {
   }
 
   function revealPhone(project) {
+    const pos = posOf(project)
     setPhoneReveal({
       id: project.id,
       number: project.phoneNumber,
-      x: project.x,
-      y: project.y,
+      x: pos.x,
+      y: pos.y,
       size: project.size,
     })
     if (phoneShakeId === project.id) {
@@ -126,9 +237,19 @@ function App() {
 
     const contentId = resolveContentId(clickedId)
     const group = getGroupProjects(contentId)
-    const size = settledCornerSize(group.length)
+    const visibleGroup = group.filter((project) => !project.hideMarker)
 
-    const flights = group.map((project) => {
+    if (!visibleGroup.length) {
+      setFlyGroup([])
+      setActiveId(contentId)
+      setFlySettled(true)
+      setPanelOpen(true)
+      return
+    }
+
+    const size = settledCornerSize(visibleGroup.length)
+
+    const flights = visibleGroup.map((project) => {
       const el = markerRefs.current[project.id]
       const rect = el?.getBoundingClientRect()
       return {
@@ -178,21 +299,87 @@ function App() {
 
   return (
     <main
-      className={`landing${volleyballOpen ? ' is-volleyball' : isContactOpen ? ' is-contact' : isOpen ? ' is-dimmed' : ''}`}
+      ref={landingRef}
+      className={`landing${introPlaying && !lowPower ? ' is-intro' : ''}${volleyballOpen ? ' is-volleyball' : isContactOpen ? ' is-contact' : isOpen ? ' is-dimmed' : ''}`}
       aria-label="Portfolio landing"
       onClick={() => setPhoneReveal(null)}
     >
-      <div className="stage" aria-hidden={isOpen}>
-        <img
-          className="portrait"
-          src={assetUrl('/me.png')}
-          alt="Allan Hadzimahovic"
-          width={360}
-          height={360}
+      {introOpen && !lowPower ? (
+        <NameIntro
+          onReveal={() => setIntroPlaying(false)}
+          onDone={() => setIntroOpen(false)}
         />
+      ) : null}
+      <button
+        type="button"
+        className={`power-sticker${lowPower ? ' is-on' : ''}`}
+        aria-pressed={lowPower}
+        aria-label={
+          lowPower
+            ? 'Low-power mode on. Click to restore full rendering.'
+            : 'Turn on low-power rendering'
+        }
+        title={lowPower ? 'Low-power mode on' : 'Low-power mode'}
+        onClick={(event) => {
+          event.stopPropagation()
+          if (lowPower) {
+            toggleLowPower()
+            setLowPowerNotice(false)
+            return
+          }
+          toggleLowPower()
+          setLowPowerNotice(true)
+          setIntroOpen(false)
+          setIntroPlaying(false)
+        }}
+      >
+        <img
+          className="power-sticker__icon"
+          src={assetUrl('/projects/sun.png')}
+          alt=""
+          width={POWER_SIZE_DESKTOP}
+          height={POWER_SIZE_DESKTOP}
+        />
+      </button>
+
+      <UsageMeter />
+
+      {lowPowerNotice ? (
+        <div
+          className="power-notice"
+          role="status"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <p>Low-power mode enabled - you are now browsing more sustainably</p>
+          <button
+            type="button"
+            className="power-notice__close"
+            aria-label="Close low-power notice"
+            onClick={() => setLowPowerNotice(false)}
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
+
+      <div className="stage" aria-hidden={isOpen}>
+        <button
+          type="button"
+          className="portrait"
+          aria-label="Open About Me, Allan Hadzimahovic"
+          aria-expanded={activeId === 'about-me'}
+          disabled={isOpen}
+          onClick={(event) => {
+            event.stopPropagation()
+            openProject('about-me')
+          }}
+        >
+          <img src={assetUrl('/me.png')} alt="" width={360} height={360} />
+        </button>
       </div>
 
       {projects.map((project) => {
+        if (project.hideMarker) return null
         const isActive = activeGroupIds.has(project.id)
         const sticker = Boolean(project.sticker)
         const tilt = project.rotate ?? 0
@@ -201,11 +388,13 @@ function App() {
         const isVolleyball = project.miniGame === 'volleyball'
         const isPhone = Boolean(project.phoneNumber)
         const skipPanel = Boolean(externalUrl || isVolleyball || isPhone)
+        const pos = posOf(project)
+        const isDragging = draggingId === project.id
         return (
           <button
             key={project.id}
             type="button"
-            className={`project-marker${sticker ? ' is-sticker' : ''}${isActive ? ' is-active' : ''}${phoneShakeId === project.id ? ' is-shaking' : ''}`}
+            className={`project-marker${sticker ? ' is-sticker' : ''}${isActive ? ' is-active' : ''}${phoneShakeId === project.id ? ' is-shaking' : ''}${isDragging ? ' is-dragging' : ''}`}
             title={
               externalUrl
                 ? `${label} (opens in new tab)`
@@ -230,14 +419,25 @@ function App() {
               markerRefs.current[project.id] = node
             }}
             style={{
-              left: `${project.x}%`,
-              top: `${project.y}%`,
+              left: `${pos.x}%`,
+              top: `${pos.y}%`,
               width: project.size,
               height: project.size,
               '--tilt': `${tilt}deg`,
             }}
+            onPointerDown={(event) => startMarkerDrag(project, event)}
+            onPointerMove={moveMarkerDrag}
+            onPointerUp={endMarkerDrag}
+            onPointerCancel={endMarkerDrag}
+            onLostPointerCapture={endMarkerDrag}
+            onDragStart={(event) => event.preventDefault()}
             onClick={(event) => {
               event.stopPropagation()
+              if (dragRef.current?.moved && dragRef.current.id === project.id) {
+                dragRef.current = null
+                return
+              }
+              dragRef.current = null
               if (externalUrl) {
                 setPhoneReveal(null)
                 window.open(externalUrl, '_blank', 'noopener,noreferrer')
@@ -271,7 +471,7 @@ function App() {
             }
           : {
               top: CORNER_INSET,
-              left: `calc(100vw - ${CORNER_INSET + size + index * (size + CORNER_GAP)}px)`,
+              left: `calc(100vw - ${powerReserve() + size + index * (size + CORNER_GAP)}px)`,
               width: size,
               height: size,
             }

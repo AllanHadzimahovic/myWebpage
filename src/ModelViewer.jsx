@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
@@ -126,6 +127,7 @@ export default function ModelViewer({
   allowUpload = true,
   note,
 }) {
+  const { lowPower } = useLowPower()
   const mountRef = useRef(null)
   const sceneRef = useRef(null)
   const [status, setStatus] = useState(src ? 'Loading model…' : 'Upload a model to inspect it')
@@ -173,6 +175,7 @@ export default function ModelViewer({
   }, [])
 
   useEffect(() => {
+    if (lowPower) return undefined
     const mount = mountRef.current
     if (!mount) return undefined
 
@@ -251,7 +254,7 @@ export default function ModelViewer({
       }
       sceneRef.current = null
     }
-  }, [])
+  }, [lowPower])
 
   useEffect(() => {
     if (!src || !sceneRef.current) return
@@ -304,6 +307,14 @@ export default function ModelViewer({
         onDrop,
       }
     : {}
+
+  if (lowPower) {
+    return (
+      <LowPowerMediaNote>
+        The 3D viewer is paused in low-power mode (no WebGL). Turn the sun off to inspect the model.
+      </LowPowerMediaNote>
+    )
+  }
 
   return (
     <div className="model-viewer">

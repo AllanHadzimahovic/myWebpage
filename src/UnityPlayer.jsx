@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
 
 /**
  * Lazy-loads a Unity WebGL build in an iframe.
  * Expects a Unity WebGL export at `src` (e.g. /games/unity/index.html).
  */
 export default function UnityPlayer({ title = 'Unity game', src, note }) {
+  const { lowPower } = useLowPower()
   const [started, setStarted] = useState(false)
   const [available, setAvailable] = useState(null) // null = checking, true/false
   const [fullscreen, setFullscreen] = useState(false)
@@ -34,6 +36,10 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
     setAvailable(null)
     setStarted(false)
 
+    if (lowPower) {
+      return undefined
+    }
+
     if (!src) {
       setAvailable(false)
       return undefined
@@ -60,7 +66,7 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
     return () => {
       cancelled = true
     }
-  }, [src])
+  }, [src, lowPower])
 
   useEffect(() => {
     if (!fullscreen) return undefined
@@ -79,6 +85,14 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
   const start = useCallback(() => {
     if (available) setStarted(true)
   }, [available])
+
+  if (lowPower) {
+    return (
+      <LowPowerMediaNote href={src} hrefLabel="Open game page">
+        Unity WebGL is paused in low-power mode so the GPU can idle.
+      </LowPowerMediaNote>
+    )
+  }
 
   if (available === false) {
     return (

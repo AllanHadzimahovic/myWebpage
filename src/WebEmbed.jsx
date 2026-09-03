@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
 
 /**
  * Embeds an external web app in an iframe, with fullscreen + open-in-new-tab.
@@ -11,6 +12,7 @@ export default function WebEmbed({
   note,
   status = 'Interactive demo — use fullscreen if the frame feels tight.',
 }) {
+  const { lowPower } = useLowPower()
   const [fullscreen, setFullscreen] = useState(false)
 
   useEffect(() => {
@@ -23,6 +25,14 @@ export default function WebEmbed({
   }, [fullscreen])
 
   if (!src) return null
+
+  if (lowPower) {
+    return (
+      <LowPowerMediaNote href={src} hrefLabel="Open in a new tab">
+        Embedded apps are paused in low-power mode.
+      </LowPowerMediaNote>
+    )
+  }
 
   return (
     <div className={`web-embed${fullscreen ? ' is-fullscreen' : ''}`}>
