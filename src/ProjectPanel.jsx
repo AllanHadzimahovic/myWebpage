@@ -416,7 +416,7 @@ export default function ProjectPanel({ project, open, onClose, awaitingFlags }) 
                   </LowPowerMediaNote>
                 ) : (
                   <div className="project-panel__pdf" key={`embed-${pdf.url}`}>
-                    <iframe src={`${assetUrl(pdf.url)}#view=FitH`} title={pdf.title} loading="lazy" />
+                    <iframe src={`${assetUrl(pdf.url)}#zoom=67`} title={pdf.title} loading="lazy" />
                   </div>
                 ),
               )}
