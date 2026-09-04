@@ -873,8 +873,8 @@ export const projects = [
   },
   {
     id: 'project-21',
-    title: 'Languages',
-    markerTitle: 'Languages',
+    title: 'Countries',
+    markerTitle: 'Countries',
     icon: '/projects/project-21.png',
     sticker: true,
     x: 78,
@@ -883,7 +883,7 @@ export const projects = [
     rotate: -6,
     summary: 'Japanese, Austrian, Spanish, and Danish.',
     description:
-      'Four flags for four languages: Japanese, German (Austria), Spanish, and Danish.',
+      'I love traveling and meeting new people - explore my exchanges below',
     youtubeId: '',
     galleries: [
       {
@@ -1130,8 +1130,6 @@ export const projects = [
     hideMarker: true,
     summary: '',
     description: '',
-    galleryHeading: 'Photos',
-    gallery: [],
     favorites: [
       {
         title: 'Books',
