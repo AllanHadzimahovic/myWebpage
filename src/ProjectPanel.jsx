@@ -360,6 +360,12 @@ export default function ProjectPanel({ project, open, onClose, awaitingFlags }) 
 
         {project.favorites?.length ? (
           <div className="project-panel__section">
+            {project.favoritesIntro ? (
+              <PokemonTextBox
+                text={project.favoritesIntro}
+                label={`${project.title} introduction`}
+              />
+            ) : null}
             <h2>Favorites</h2>
             <div className="favorites-box">
               {project.favorites.map((list) => (

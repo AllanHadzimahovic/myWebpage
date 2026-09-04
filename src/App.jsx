@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { projects } from './data/projects.js'
 import { assetUrl } from './assetUrl.js'
 import ProjectPanel from './ProjectPanel.jsx'
@@ -21,7 +21,10 @@ const POWER_SIZE_MOBILE = 72
 const POWER_INSET = 16
 const POWER_GAP = 12
 const POSITIONS_KEY = 'sticker-positions'
+const GITHUB_ID = 'project-15'
 const DRAG_THRESHOLD_PX = 8
+const WELCOME_TEXT =
+  'Hey there! Click around to explore my projects - click on me to get to know me'
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
@@ -43,6 +46,68 @@ function savePositions(positions) {
   } catch {
     // private mode / blocked storage
   }
+}
+
+function WelcomeHint({ githubId, pos, size, landingRef, markerRefs }) {
+  const [box, setBox] = useState(null)
+
+  useLayoutEffect(() => {
+    const landing = landingRef.current
+    const githubEl = markerRefs.current[githubId]
+    if (!landing || !githubEl) return undefined
+
+    function place() {
+      const lr = landing.getBoundingClientRect()
+      const gr = githubEl.getBoundingClientRect()
+      const gap = 10
+      const pad = 12
+      const rightEdge = gr.left - lr.left - gap
+      const desired = Math.min(300, Math.max(168, lr.width * 0.36))
+      let width = Math.min(desired, Math.max(0, rightEdge - pad))
+      let left = rightEdge
+      let top = gr.top + gr.height * 0.62 - lr.top
+      let placement = 'left'
+
+      if (width < 120) {
+        width = Math.min(desired, Math.max(168, lr.width - pad * 2))
+        const minLeft = pad + width
+        const maxLeft = lr.width - pad
+        left = Math.min(maxLeft, Math.max(minLeft, rightEdge))
+        top = gr.bottom - lr.top + 8
+        placement = 'below'
+      }
+
+      setBox({ top, left, width, placement })
+    }
+
+    place()
+    const ro = new ResizeObserver(place)
+    ro.observe(landing)
+    ro.observe(githubEl)
+    window.addEventListener('resize', place)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', place)
+    }
+  }, [githubId, pos.x, pos.y, size, landingRef, markerRefs])
+
+  if (!box) return null
+
+  return (
+    <div
+      className={`welcome-hint${box.placement === 'below' ? ' is-below' : ''}`}
+      style={{
+        top: box.top,
+        left: box.left,
+        width: box.width,
+      }}
+      role="status"
+      aria-live="polite"
+    >
+      <PokemonTextBox compact text={WELCOME_TEXT} label="Welcome" />
+      <span className="welcome-hint__tail" aria-hidden="true" />
+    </div>
+  )
 }
 
 function powerStickerSize() {
@@ -126,6 +191,7 @@ function App() {
   const [lowPowerNotice, setLowPowerNotice] = useState(false)
   const [positions, setPositions] = useState(loadSavedPositions)
   const [draggingId, setDraggingId] = useState(null)
+  const [welcomeHint, setWelcomeHint] = useState(true)
   const markerRefs = useRef({})
   const landingRef = useRef(null)
   const dragRef = useRef(null)
@@ -140,6 +206,10 @@ function App() {
   const isOpen = Boolean(activeId) || volleyballOpen
   const isContactOpen = Boolean(active?.contact)
   const activeGroupIds = new Set(getGroupProjects(activeId || '').map((project) => project.id))
+
+  function dismissWelcomeHint() {
+    setWelcomeHint(false)
+  }
 
   useEffect(() => {
     return () => {
@@ -189,6 +259,10 @@ function App() {
     }
     return { x: project.x, y: project.y }
   }
+
+  const github = projects.find((project) => project.id === GITHUB_ID)
+  const githubPos = github ? posOf(github) : null
+  const showWelcomeHint = Boolean(welcomeHint && !introPlaying && github && !isOpen)
 
   function startMarkerDrag(project, event) {
     if (event.button != null && event.button !== 0) return
@@ -270,6 +344,7 @@ function App() {
   }
 
   function openProject(clickedId) {
+    dismissWelcomeHint()
     setPhoneReveal(null)
     if (closeTimer.current) {
       clearTimeout(closeTimer.current)
@@ -569,6 +644,7 @@ function App() {
                 return
               }
               dragRef.current = null
+              dismissWelcomeHint()
               if (externalUrl) {
                 setPhoneReveal(null)
                 window.open(externalUrl, '_blank', 'noopener,noreferrer')
@@ -595,6 +671,16 @@ function App() {
           </button>
         )
       })}
+
+      {showWelcomeHint ? (
+        <WelcomeHint
+          githubId={GITHUB_ID}
+          pos={githubPos}
+          size={github.size}
+          landingRef={landingRef}
+          markerRefs={markerRefs}
+        />
+      ) : null}
 
       {flyGroup.map((flight, index) => {
         const size = flight.size ?? CORNER_SIZE

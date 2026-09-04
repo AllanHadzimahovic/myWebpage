@@ -24,7 +24,8 @@ html.low-power .landing {
     filter 420ms ease;
 }
 
-.landing.is-dimmed .project-marker {
+.landing.is-dimmed .project-marker,
+.landing.is-dimmed .welcome-hint {
   opacity: 0;
 }
 
@@ -71,7 +72,8 @@ html.low-power .landing {
 .landing.is-intro .project-marker,
 .landing.is-intro .power-sticker,
 .landing.is-intro .power-notice,
-.landing.is-intro .usage-meter {
+.landing.is-intro .usage-meter,
+.landing.is-intro .welcome-hint {
   opacity: 0;
   pointer-events: none;
   filter: none;
@@ -278,6 +280,60 @@ html.low-power .landing {
 
 .phone-reveal .poke-box {
   margin-bottom: 0;
+}
+
+.welcome-hint {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-100%, -50%);
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.welcome-hint.is-below {
+  transform: translate(-100%, 0);
+}
+
+.welcome-hint .poke-box {
+  margin-bottom: 0;
+  font-size: 0.55rem;
+  line-height: 1.7;
+  min-height: 6.4rem;
+  padding-bottom: 0.7rem;
+}
+
+.welcome-hint .poke-box__arrow {
+  display: none;
+}
+
+.welcome-hint__tail {
+  position: absolute;
+  right: 2.4rem;
+  bottom: 0.35rem;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-right: 3px solid #111;
+  border-bottom: 3px solid #111;
+  transform: translateY(70%) rotate(45deg);
+  z-index: 0;
+}
+
+@media (max-width: 640px) {
+  .welcome-hint .poke-box {
+    font-size: 0.46rem;
+    line-height: 1.65;
+    min-height: 4.8rem;
+    border-width: 16px;
+    padding: 0.1rem 0.55rem 0.55rem 0.4rem;
+  }
+
+  .welcome-hint__tail {
+    right: 1.4rem;
+    bottom: 0.2rem;
+    width: 13px;
+    height: 13px;
+  }
 }
 
 .flying-icon {

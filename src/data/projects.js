@@ -9,6 +9,7 @@
  * gallery: [{ src, alt?, caption?, text? } | { type:'youtube', youtubeId, alt?, caption?, text? }] — primary carousel.
  *   caption / text — shown in a box to the right of that slide.
  * favorites: [{ title, items: [string | { title, url }] }] — boxed lists (About Me, etc).
+ * favoritesIntro — Pokémon text box rendered at the top of the Favorites section.
  * galleryHeading: optional h2 for the primary gallery (default "Gallery").
  * galleryBeforeVideo: true — render the primary gallery above the Video section.
  * gallerySecondary: same shape as gallery; rendered below primary (above Documents).
@@ -1013,6 +1014,10 @@ export const projects = [
             alt: 'Allan on a beach volleyball court in Copenhagen, white tank, black shorts, cap, and mirrored sunglasses',
           },
           {
+            src: '/projects/flags/danish/08.jpg',
+            alt: 'Volleyball group photo on a beach court in Copenhagen, yellow net and a ball in the sand',
+          },
+          {
             src: '/projects/flags/danish/04.jpg',
             alt: 'Allan under cherry blossoms on a path, bike helmet on, holding a bike',
           },
@@ -1130,6 +1135,8 @@ export const projects = [
     hideMarker: true,
     summary: '',
     description: '',
+    favoritesIntro:
+      'Hi there! My name is Allan :) - I’m a recent graduate from ITU where I studied MSc. Digital Innovation & Management - before that i studied Project Management at CBS. I love meeting new people and working in teams.',
     favorites: [
       {
         title: 'Books',
