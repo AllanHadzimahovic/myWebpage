@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
+import PokemonTextBox from './PokemonTextBox.jsx'
 
 /**
  * Lazy-loads a Unity WebGL build in an iframe.
@@ -106,7 +107,7 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
             <code>public/games/unity/</code> so that{' '}
             <code>{src || '/games/unity/index.html'}</code> exists.
           </p>
-          {note ? <p className="unity-player__note">{note}</p> : null}
+          {note ? <PokemonTextBox text={note} label={`${title} note`} /> : null}
         </div>
       </div>
     )
@@ -117,13 +118,17 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
       <div className="unity-player__toolbar">
         <div>
           <p className="unity-player__title">{title}</p>
-          <p className="unity-player__status">
-            {available === null
-              ? 'Checking for WebGL build…'
-              : started
-                ? 'Game loaded — click the canvas if controls feel unresponsive.'
-                : 'Click Play to load the game (large download).'}
-          </p>
+          <PokemonTextBox
+            compact
+            label={`${title} status`}
+            text={
+              available === null
+                ? 'Checking for WebGL build…'
+                : started
+                  ? 'Game loaded — click the canvas if controls feel unresponsive.'
+                  : 'Click Play to load the game (large download).'
+            }
+          />
         </div>
         <div className="unity-player__actions">
           {started ? (
@@ -168,7 +173,7 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
         )}
       </div>
 
-      {note ? <p className="unity-player__note">{note}</p> : null}
+      {note ? <PokemonTextBox text={note} label={`${title} note`} /> : null}
     </div>
   )
 }

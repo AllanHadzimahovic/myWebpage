@@ -4,17 +4,23 @@
  * rotate: degrees of tilt (optional).
  * x/y: percent of the full landing viewport.
  * stills: [{ src, alt? }] — static images in a row (e.g. two photos above a PDF).
+ * stillsPlacement: 'end' — render stills after Links instead of above Documents.
  * hideMarker: true — content-only entry (not drawn as a landing sticker).
- * gallery: [{ src, alt?, caption? } | { type:'youtube', youtubeId, alt?, caption? }] — primary carousel.
- *   caption — text shown under the current slide.
+ * gallery: [{ src, alt?, caption?, text? } | { type:'youtube', youtubeId, alt?, caption?, text? }] — primary carousel.
+ *   caption / text — shown in a box to the right of that slide.
  * favorites: [{ title, items: [string | { title, url }] }] — boxed lists (About Me, etc).
  * galleryHeading: optional h2 for the primary gallery (default "Gallery").
+ * galleryBeforeVideo: true — render the primary gallery above the Video section.
  * gallerySecondary: same shape as gallery; rendered below primary (above Documents).
  * gallerySecondaryHeading: optional h2 for that section (default "Partners").
- * galleries: [{ heading, images, fit? }] — extra named carousels after gallerySecondary.
+ * galleries: [{ heading, images, fit?, note?, flag?, flyFlag? }] — extra named carousels after gallerySecondary.
  *   fit: 'portrait' — taller frame for tall slides (Scrum pages, etc.).
+ *   note — read-only text box rendered above that gallery.
+ *   flag — die-cut PNG parked beside that gallery (not a carousel slide).
+ *   flyFlag — landing sticker splits and this flag flies to the gallery dock.
  * phoneNumber — skip panel; shake the sticker and show this number in a text box.
- * languageGroups: [{ heading, items: [{ title, src, text }], credit? }] — labeled icon grids; click opens a text box.
+ * confetti: true — skip panel; rain confetti from the top of the screen for 7 seconds.
+ * languageGroups: [{ heading, intro?, items: [{ title, src, text }], credit? }] — labeled icon grids; click opens a text box.
  * languageStickers / languageStickersHeading — older single-grid shape (still supported).
  */
 export const projects = [
@@ -29,7 +35,7 @@ export const projects = [
     rotate: -12,
     summary: 'DOT LEGO Ideas case study.',
     description:
-      'Read the full case below — problem, approach, and outcomes for the LEGO Ideas project.',
+      'Ever since I was a kid, I have loved building LEGO - my favourite set was the Mercedes-Benz Arocs 3245 :) This shifted into playing Lego Star Wars, Rock Raiders, Racers and many more. Lately, I have been interested in LEGO Ideas, which my group wrote a paper on.',
     youtubeId: '',
     stills: [
       {
@@ -68,7 +74,7 @@ export const projects = [
     id: 'project-3',
     title: 'Contact me',
     markerTitle: 'Email',
-    icon: '/projects/project-3.png',
+    icon: '/projects/email-at.png',
     sticker: true,
     x: 94,
     y: 42,
@@ -79,30 +85,10 @@ export const projects = [
     contact: {
       channel: 'email',
       to: 'allanh@live.dk',
+      sticker: '/projects/email-at.png',
+      label: 'Send me an email here',
     },
     youtubeId: '',
-    pdfs: [],
-    links: [],
-  },
-  {
-    id: 'project-4',
-    title: 'Polaroid',
-    icon: '/projects/project-4.png',
-    sticker: true,
-    x: 78,
-    y: 82,
-    size: 108,
-    rotate: -6,
-    summary: 'Photography — polaroid stills.',
-    description: 'Instant photos from the Polaroid. Browse the prints in the gallery below.',
-    youtubeId: '',
-    galleryHeading: 'Photos',
-    gallery: [
-      {
-        src: '/projects/polaroid/01.webp',
-        alt: 'Meme: a late project hires a project manager, then spends 20% of time in meetings',
-      },
-    ],
     pdfs: [],
     links: [],
   },
@@ -117,7 +103,7 @@ export const projects = [
     size: 108,
     rotate: 10,
     summary: 'Pick a time that works — book a 30-minute meeting with Allan.',
-    description: 'Use the calendar below to choose a slot. You’ll get a confirmation by email.',
+    description: 'Hi - you can book me in for a meeting below :)',
     youtubeId: '',
     webEmbed: {
       heading: 'Schedule',
@@ -163,7 +149,7 @@ export const projects = [
     rotate: 4,
     summary: 'Playable Unity WebGL game — defend, build, and survive.',
     description:
-      'Real Balloons is a Unity game with custom gameplay systems (enemies, turrets, menus, and a game state machine). This page embeds the WebGL build so visitors can play in the browser. Click Play to load the game (first load downloads the build).',
+      'Ever played Bloons? This is a game where you buy towers but you can also damage waves of enemies with your own character. Can you survive long enough to build all towers? You can also check out the code below. It was fun working with game states, event listeners and loops :)\n\nI built it in Unity using C#. AI was only used for deploying the game, not for developing it.',
     youtubeId: '8knwQV1mQww',
     unityWebGL: {
       title: 'Real Balloons',
@@ -239,7 +225,7 @@ export const projects = [
   },
   {
     id: 'project-10',
-    title: 'Microsoft Learn',
+    title: 'Scrum Master',
     icon: '/projects/project-10.png',
     sticker: true,
     x: 28,
@@ -248,13 +234,17 @@ export const projects = [
     rotate: -4,
     summary: 'Microsoft Learn certifications and learning paths.',
     description:
-      'Badges and screenshots from Microsoft Learn courses and certifications. Explore the Miro board below for the learning overview.',
+      'Industrial Scrum Master Training\n\nThis course was a lot of fun! As a Scrum Master, I was paired up with 8 bachelor students, a Product Owner ([Tastelater](https://tastelater.com/)) and a Technical Specialist. For 4 months and over 6 sprints, we developed the frontend and backend of a transaction register for different user roles. It was fun to learn about Git, Pull Requests and testing but even more fun to learn about the Scrum Methodology, teamwork, alignment and the low-level difficulties of working 10 on a project. It was fun to work with Miro and we created a lot of memes :)\n\nAfter passing the exam, all Scrum Master’s received their [official certification](https://bcert.me/bc/html/show-badge.html?b=efrobwzy).',
     youtubeId: 'jmbbQRJH__0',
     webEmbed: {
       heading: 'Miro board',
       title: 'Microsoft Learn board',
       src: 'https://miro.com/app/live-embed/uXjVIeWTLeQ=/?embedMode=view_only_without_ui&autoplay=true',
       note: 'Pan and zoom inside the board if needed. If the embed stays blank, use Open in new tab.',
+      image: {
+        src: '/projects/microsoft-learn/scrum-team.jpg',
+        alt: 'Scrum Master training team standing together outside a café',
+      },
     },
     galleryHeading: 'Certifications',
     gallery: [
@@ -360,7 +350,14 @@ export const projects = [
         ],
       },
     ],
-    pdfs: [],
+    pdfs: [
+      {
+        title: 'ISE Slides',
+        url: '/files/ise-slides.pdf',
+        filename: 'ISE-Slides.pdf',
+        embed: true,
+      },
+    ],
     links: [
       {
         title: 'Open Miro board',
@@ -379,8 +376,9 @@ export const projects = [
     y: 28,
     size: 108,
     rotate: 0,
-    summary: 'HTMAA chess machine — Prusa prints, Raspberry Pi, CAD, and electronics.',
-    description: 'Watch the prototype video, then browse CAD, finished bins, and prints from the bed.',
+    summary: 'HTMAA chess machine — Prusa prints, Arduino, CAD, and electronics.',
+    description:
+      'My group and I built a Chess Robot - check it out below. It utilises stepper motors, an Arduino, an electromagnet, belts and a lot more :)\n\nThe coloured parts are 3D-printed on a Prusa MK4s and the chess board is laser cut. We also built a line-following robot called ‘Crab’ :)\n\nThe robots are designed in Autodesk Fusion, sliced in PrusaSlicer and coded in C++.',
     youtubeId: '',
     model3d: {
       title: 'Assembly (interactive)',
@@ -435,7 +433,7 @@ export const projects = [
   },
   {
     id: 'project-12',
-    title: 'Arduino & Terminal',
+    title: 'Kwaxolo Impact Challenge',
     icon: '/projects/project-12.png',
     sticker: true,
     markerTitle: 'Arduino',
@@ -444,17 +442,34 @@ export const projects = [
     y: 64,
     size: 108,
     rotate: 7,
-    summary: 'Hardware, CLI workflows, and a live educational web app.',
+    summary: 'Live educational web app - Lovable and Claude Code.',
     description:
-      'Arduino electronics paired with terminal / CLI work — plus Sibanye.school, an interactive digital-literacy app for South African classrooms. Try the live demo below (or open it full-screen in a new tab).',
+      'Ever played Club Penguin? We made something similar for the KwaXolo Impact Challenge which focuses on Digital Literacy in KwaXolo, South Africa. After creating your own avatar, students can learn about blogs, emails, forums, digital drawing, uploading pictures and many other elements of digital literacy. Students collectively work to upgrade and decorate their school by completing quizzes. The application is hooked up to a Claude API Key so that teachers are empowered to develop and expand the application. The application is built with Lovable and Claude Code.',
     youtubeId: '',
     webEmbed: {
       heading: 'Try it',
       title: 'Sibanye.school',
       src: 'https://git-sweetener.lovable.app/school',
       note: 'If the embed stays blank, use Open in new tab — some browsers or networks block third-party frames.',
+      images: [
+        {
+          src: '/projects/kwaxolo/royal-hacks.jpg',
+          alt: 'Team at Royal Hacks, IT University of Copenhagen, April 2026',
+        },
+        {
+          src: '/projects/kwaxolo/royal-hacks-2.jpg',
+          alt: 'KwaXolo Learn pitch in a lecture hall',
+        },
+      ],
     },
-    pdfs: [],
+    pdfs: [
+      {
+        title: 'KwaXolo Impact Challenge — Case',
+        url: '/files/kwaxolo-impact-challenge-case.pdf',
+        filename: 'KwaXolo-Impact-Challenge-Case.pdf',
+        embed: true,
+      },
+    ],
     links: [
       {
         title: 'Sibanye.school (full site)',
@@ -464,10 +479,10 @@ export const projects = [
   },
   {
     id: 'project-13',
-    title: 'Raspberry Pi',
+    title: 'Arduino',
     icon: '/projects/project-13.png',
     sticker: true,
-    markerTitle: 'Raspberry Pi',
+    markerTitle: 'Arduino',
     groupId: 'htmaa-chess',
     linkTo: 'project-11',
     x: 22,
@@ -529,8 +544,28 @@ export const projects = [
     size: 108,
     rotate: 9,
     summary: 'Partnership / project with the Maternity Foundation.',
-    description: 'Describe the collaboration, outcomes, and impact here.',
+    description:
+      'For our Master’s Thesis, we collaborated with the amazing NGO Maternity Foundation to investigate Digitalisation of NGOs. It was great fun - we automated a manual data analysis process through Azure, Power Automate, Power BI and Data Factory. Here, we realised how important strategy and alignment are for generating value from data.',
     youtubeId: 'PCzt8Gsm4wE',
+    galleryBeforeVideo: true,
+    gallery: [
+      {
+        src: '/projects/maternity-foundation/thesis.jpg',
+        alt: 'Thesis group with flowers and papers in front of a glass campus building',
+      },
+      {
+        src: '/projects/maternity-foundation/02.jpg',
+        alt: 'Two people smiling and pointing toward each other in a glass atrium',
+      },
+      {
+        src: '/projects/maternity-foundation/03.jpg',
+        alt: 'Talking with family and guests in the glass lobby after the thesis defence',
+      },
+      {
+        src: '/projects/maternity-foundation/04.jpg',
+        alt: 'Hugging at the thesis celebration with Danish flags in the lobby',
+      },
+    ],
     pdfs: [
       {
         title: 'Masters Thesis — DSR Study of Impact Reporting in NPO',
@@ -557,7 +592,8 @@ export const projects = [
     size: 120,
     rotate: -5,
     summary: 'Languages, applications, and project tools I work with.',
-    description: 'The rubber duck keeps me company while debugging. Tap a logo to read more.',
+    description:
+      'Below are the languages and applications I have worked with. I’m not a programming expert, but I have a fundamental understanding of everything :)',
     youtubeId: '',
     languageGroups: [
       {
@@ -598,6 +634,26 @@ export const projects = [
             title: 'C#',
             src: '/projects/languages/csharp.png',
             text: 'The language behind the Real Balloons Unity game — gameplay, input, menus, and the scripts that hold a scene together.',
+          },
+          {
+            title: 'HTML',
+            src: '/projects/languages/html.png',
+            text: 'The markup of the web. Structure, headings, forms, and the skeleton every page in this portfolio sits on.',
+          },
+          {
+            title: 'CSS',
+            src: '/projects/languages/css.png',
+            text: 'How the page actually looks — layout, type, color, and the sticker landing without turning it into a marketing site.',
+          },
+          {
+            title: 'HTTP',
+            src: '/projects/languages/http.png',
+            text: 'How browsers and servers talk. Requests, responses, and the protocol behind every API call and page load.',
+          },
+          {
+            title: 'Zsh',
+            src: '/projects/languages/zsh.png',
+            text: 'My daily shell. Aliases, prompts, and the terminal workflows that sit behind Arduino, Git, and this portfolio’s build loop.',
           },
         ],
       },
@@ -659,6 +715,31 @@ export const projects = [
             src: '/projects/languages/github-app.png',
             text: 'Where the repos live — issues, history, and this portfolio at github.com/AllanHadzimahovic.',
           },
+          {
+            title: 'Git',
+            src: '/projects/languages/git.png',
+            text: 'Version control. Commits, branches, and the history that makes it safe to try something and still get back.',
+          },
+          {
+            title: 'Ollama',
+            src: '/projects/languages/ollama.png',
+            text: 'Run language models on my own machine. Useful when the work should stay local instead of going out to a hosted API.',
+          },
+          {
+            title: 'DuckDB',
+            src: '/projects/languages/duckdb.png',
+            text: 'An in-process analytical database. Fast SQL over files and tables without standing up a separate server.',
+          },
+          {
+            title: 'Lovable',
+            src: '/projects/languages/lovable.png',
+            text: 'The web-app builder behind Sibanye.school — prompt a working UI, then keep the parts worth shipping.',
+          },
+          {
+            title: 'Autodesk Fusion',
+            src: '/projects/languages/autodesk-fusion.png',
+            text: 'CAD for parts and assemblies. The Chess Machine models start here before they hit the Prusa bed.',
+          },
         ],
       },
       {
@@ -689,6 +770,47 @@ export const projects = [
             src: '/projects/languages/google-workspace.png',
             text: 'Docs, Drive, Calendar, Meet — the Google side of sharing files and getting people in the same room.',
           },
+          {
+            title: 'e-conomic',
+            src: '/projects/languages/economic.png',
+            text: 'Danish accounting software (Visma e-conomic). Invoices, bookkeeping, and the numbers a small operation actually files.',
+          },
+          {
+            title: 'HubSpot',
+            src: '/projects/languages/hubspot.png',
+            text: 'CRM and inbound tools — contacts, pipelines, and the marketing/sales side of keeping follow-ups in one place.',
+          },
+        ],
+      },
+      {
+        heading: 'Programs I want to learn',
+        intro: 'Of course, more about the programs above',
+        items: [
+          {
+            title: 'SAP',
+            src: '/projects/languages/sap.png',
+            text: 'Enterprise software for finance, logistics, and the rest of a company’s operating system. Next on the list to learn properly.',
+          },
+          {
+            title: 'C',
+            src: '/projects/languages/c.png',
+            text: 'The language underneath a lot of systems work. Closer to the metal than C++ — memory, pointers, and how the machine actually runs the program.',
+          },
+          {
+            title: 'Playwright',
+            src: '/projects/languages/playwright.png',
+            text: 'Browser automation and end-to-end tests. Click through a real page the way a user would, and catch what broke before they do.',
+          },
+          {
+            title: 'Amazon Web Services',
+            src: '/projects/languages/aws.png',
+            text: 'AWS — the other big cloud. Compute, storage, and the catalog of services that sit behind a lot of production apps.',
+          },
+          {
+            title: 'BridgeMind',
+            src: '/projects/languages/bridgemind.png',
+            text: 'A vibe-coding / agent workspace — describe the work in plain language and let agents ship from the terminal.',
+          },
         ],
       },
     ],
@@ -707,6 +829,300 @@ export const projects = [
     rotate: -14,
     // Landing shake + text box — skips ProjectPanel.
     phoneNumber: '+45 42319931',
+  },
+  {
+    id: 'project-19',
+    title: 'Coffee Shop',
+    markerTitle: 'Coffee',
+    icon: '/projects/project-19.png',
+    sticker: true,
+    x: 80,
+    y: 46,
+    size: 108,
+    rotate: 7,
+    summary: 'ITU Introduction to Database Systems — Javalin + DuckDB coffee shop.',
+    description:
+      'A Java web app I built for Introduction to Database Systems: register, log in, buy drinks, and browse purchases against a DuckDB schema. The live demo below is the same shop (pages, products, and seed users as App.java). Try Anna / test, Martin / test, or Omar / test — or create your own account.',
+    youtubeId: '',
+    webEmbed: {
+      heading: 'Coffee Shop',
+      title: 'Coffee Shop',
+      src: '/apps/coffeeshop/index.html',
+      status: 'Register or log in to buy. Seed logins: Anna, Martin, or Omar — password test.',
+      note: 'Purchases stay in this browser. Java source for the original Javalin + DuckDB server is in the Code section.',
+    },
+    code: [
+      { title: 'App.java', url: '/files/code/coffeeshop/App.java', language: 'java' },
+      { title: 'init.sql', url: '/files/code/coffeeshop/init.sql', language: 'sql' },
+    ],
+    pdfs: [],
+    links: [],
+  },
+  {
+    id: 'project-20',
+    title: 'Celebration',
+    markerTitle: 'Celebrate',
+    icon: '/projects/project-20.png',
+    sticker: true,
+    x: 24,
+    y: 56,
+    size: 108,
+    rotate: 16,
+    // Landing confetti rain — skips ProjectPanel (see ConfettiRain.jsx).
+    confetti: true,
+  },
+  {
+    id: 'project-21',
+    title: 'Languages',
+    markerTitle: 'Languages',
+    icon: '/projects/project-21.png',
+    sticker: true,
+    x: 78,
+    y: 78,
+    size: 108,
+    rotate: -6,
+    summary: 'Japanese, Austrian, Spanish, and Danish.',
+    description:
+      'Four flags for four languages: Japanese, German (Austria), Spanish, and Danish.',
+    youtubeId: '',
+    galleries: [
+      {
+        heading: 'Japanese',
+        flag: '/projects/flags/japan.png',
+        flyFlag: true,
+        note: "I was on exchange in Japan - it was surreal and I'm definitely going back at some point :)",
+        images: [
+          {
+            src: '/projects/flags/japanese/01.jpg',
+            alt: 'Group on a snowy wooden bridge in a mountain village in Japan',
+          },
+          {
+            src: '/projects/flags/japanese/02.jpg',
+            alt: 'Allan on a snowy street in front of a temple town, beanie and olive jacket',
+          },
+          {
+            src: '/projects/flags/japanese/03.jpg',
+            alt: 'Face-in-hole Maidreamin cutout in Akihabara, welcome to Akihabara sign',
+          },
+          {
+            src: '/projects/flags/japanese/04.jpg',
+            alt: 'Allan on a snowy pier by a lake, peace sign, small boat beside the dock',
+          },
+          {
+            src: '/projects/flags/japanese/05.jpg',
+            alt: 'Group at sunset by the sea with Mount Fuji in the background',
+          },
+          {
+            src: '/projects/flags/japanese/06.jpg',
+            alt: 'Friends in yukata around a long kaiseki dinner table',
+          },
+          {
+            src: '/projects/flags/japanese/07.jpg',
+            alt: 'Group by a river with autumn hills in the background',
+          },
+        ],
+      },
+      {
+        heading: 'Austrian',
+        flag: '/projects/flags/austria.png',
+        flyFlag: true,
+        note: 'My girlfriend is from Vorarlberg, Austria - so Austria is now my second home',
+        images: [
+          {
+            src: '/projects/flags/austrian/01.jpg',
+            alt: 'Three people standing together on a frozen snowy lake with a forested hillside behind',
+          },
+          {
+            src: '/projects/flags/austrian/02.jpg',
+            alt: 'Family group in a garden in front of a wooden house in Vorarlberg',
+          },
+          {
+            src: '/projects/flags/austrian/03.jpg',
+            alt: 'Allan fishing at a turquoise alpine lake with mountains and a dam in the background',
+          },
+          {
+            src: '/projects/flags/austrian/04.jpg',
+            alt: 'Four people hiking a gravel path through a wet green forest',
+          },
+          {
+            src: '/projects/flags/austrian/05.jpg',
+            alt: 'Allan hiking with an older man in the Austrian Alps, poles and backpacks',
+          },
+          {
+            src: '/projects/flags/austrian/06.jpg',
+            alt: 'Allan and his girlfriend on a grassy alpine pasture with a cow and a wooden cross',
+          },
+          {
+            src: '/projects/flags/austrian/07.jpg',
+            alt: 'Allan and his girlfriend hugging on a mountain path with limestone peaks behind',
+          },
+          {
+            src: '/projects/flags/austrian/08.jpg',
+            alt: 'Family group with sleds on a foggy snowy slope in the Austrian Alps',
+          },
+        ],
+      },
+      {
+        heading: 'Spanish',
+        flag: '/projects/flags/spain.png',
+        flyFlag: true,
+        note: 'During my sabbatical year, I was 9 months in Alzira, Valencia with the European Solidarity Corps',
+        images: [
+          {
+            src: '/projects/flags/spanish/01.jpg',
+            alt: 'Hill town and mountains beyond a wooden fence and lawn under a clear blue sky near Alzira',
+          },
+          {
+            src: '/projects/flags/spanish/02.jpg',
+            alt: 'Allan and a friend laughing over coffee and chocolate croissants at an outdoor café',
+          },
+          {
+            src: '/projects/flags/spanish/03.jpg',
+            alt: 'Allan and a friend at a café table with tuna bocadillos',
+          },
+          {
+            src: '/projects/flags/spanish/04.jpg',
+            alt: 'European Solidarity Corps group photo in front of the Idea building in Alzira',
+          },
+          {
+            src: '/projects/flags/spanish/05.jpg',
+            alt: 'Allan presenting Cuerpo Europeo de Solidaridad next to a colleague at a blue table',
+          },
+          {
+            src: '/projects/flags/spanish/06.jpg',
+            alt: 'Allan with backpacks and a suitcase pointing at Torre Glòries in Barcelona',
+          },
+        ],
+      },
+      {
+        heading: 'Danish',
+        flag: '/projects/flags/denmark.png',
+        flyFlag: true,
+        note: 'My favorite activities - hanging out with friends, playing volleyball and exploring Copenhagen',
+        images: [
+          {
+            src: '/projects/flags/danish/01.jpg',
+            alt: 'Group photo in front of a TECHBBQ backdrop',
+          },
+          {
+            src: '/projects/flags/danish/02.jpg',
+            alt: 'Three people playing a board game at a wooden cabin table at night',
+          },
+          {
+            src: '/projects/flags/danish/03.jpg',
+            alt: 'Allan on a beach volleyball court in Copenhagen, white tank, black shorts, cap, and mirrored sunglasses',
+          },
+          {
+            src: '/projects/flags/danish/04.jpg',
+            alt: 'Allan under cherry blossoms on a path, bike helmet on, holding a bike',
+          },
+          {
+            src: '/projects/flags/danish/05.jpg',
+            alt: 'Friends hanging out in a Copenhagen apartment living room',
+          },
+          {
+            src: '/projects/flags/danish/06.jpg',
+            alt: 'Couple at a wedding reception under a white tent; man in navy tuxedo, woman in pink dress with a white bouquet',
+          },
+          {
+            src: '/projects/flags/danish/07.jpg',
+            alt: 'Family wedding photo in front of a Danish stone house with red window frames',
+          },
+        ],
+      },
+      {
+        heading: 'EU',
+        flag: '/projects/flags/eu.png',
+        note: "Do you know Erasmus+ Youth Exchanges? It's week-long intercultural exchanges with focus on soft skills such as empathy, patience, communication and inclusion. Here are pictures from Czech Republic, Italy and Portugal :)",
+        images: [
+          {
+            src: '/projects/flags/eu/01.jpg',
+            alt: 'Erasmus+ group on a viewpoint above a riverside city in Portugal',
+          },
+          {
+            src: '/projects/flags/eu/02.jpg',
+            alt: 'Friends in a close selfie during an Erasmus+ Youth Exchange',
+          },
+          {
+            src: '/projects/flags/eu/03.jpg',
+            alt: 'Group around a table with Danish flags, snacks, and drinks at a cultural evening',
+          },
+          {
+            src: '/projects/flags/eu/04.jpg',
+            alt: 'Erasmus+ group by a forest river, waving',
+          },
+        ],
+      },
+    ],
+    pdfs: [],
+    links: [],
+  },
+  {
+    id: 'project-22',
+    title: 'Education and Work',
+    markerTitle: 'Education and Work',
+    icon: '/projects/project-22.png',
+    sticker: true,
+    x: 66,
+    y: 34,
+    size: 108,
+    rotate: -11,
+    summary: 'Degrees, jobs, and the paper trail between them.',
+    description:
+      'Education and work — CVs, diplomas, and the path between school and jobs. Stickers below are workplaces; documents sit further down.',
+    youtubeId: '',
+    languageGroups: [
+      {
+        heading: 'Work',
+        items: [
+          {
+            title: 'TECHBBQ',
+            src: '/projects/education/techbbq.png',
+            text: 'TECHBBQ — Copenhagen tech festival and community.',
+          },
+          {
+            title: 'Nykredit',
+            src: '/projects/education/nykredit.png',
+            text: 'Nykredit — Danish mortgage bank and financial group.',
+          },
+          {
+            title: 'Hobbii',
+            src: '/projects/education/hobbii.png',
+            text: 'Hobbii — yarn, knitting, and craft.',
+          },
+          {
+            title: 'INVIXO',
+            src: '/projects/education/invixo.png',
+            text: 'INVIXO (part of ECIT) — Assistant Partner Manager and Assistant Project Manager: deal-registration tool for Boomi, plus BizTalk / integrations work including Scandlines.',
+          },
+          {
+            title: 'K.B. Hallen',
+            src: '/projects/education/kb-hallen.png',
+            text: 'K.B. Hallen — concert and event venue in Copenhagen.',
+          },
+          {
+            title: 'Normal',
+            src: '/projects/education/normal.png',
+            text: 'Normal — Danish variety retail.',
+          },
+        ],
+      },
+    ],
+    pdfs: [
+      {
+        title: 'CV + Transcripts',
+        url: '/files/cv-transcripts.pdf',
+        filename: 'CV-Transcripts.pdf',
+        embed: true,
+      },
+      {
+        title: 'Certifications and Recommendations',
+        url: '/files/certifications-and-recommendations.pdf',
+        filename: 'Certifications-and-Recommendations.pdf',
+        embed: true,
+      },
+    ],
+    links: [],
   },
   {
     id: 'about-me',

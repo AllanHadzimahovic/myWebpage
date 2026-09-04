@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { assetUrl } from './assetUrl.js'
 import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
+import PokemonTextBox from './PokemonTextBox.jsx'
 
 function isYoutubeItem(item) {
   return item?.type === 'youtube' || Boolean(item?.youtubeId)
@@ -11,11 +12,44 @@ function slideKey(item, i) {
   return item.src || `slide-${i}`
 }
 
-export default function ProjectGallery({ images, title, heading = 'Gallery', fit }) {
+function GalleryShell({ heading, flag, flagHidden, children }) {
+  const body = (
+    <>
+      <h2>{heading}</h2>
+      {children}
+    </>
+  )
+  if (!flag) {
+    return <div className="project-panel__section">{body}</div>
+  }
+  return (
+    <div className="project-panel__section project-panel__section--flag-gallery">
+      <div className="gallery-flag-dock" data-flag-dock={heading}>
+        <img
+          src={assetUrl(flag)}
+          alt=""
+          className={`gallery-flag-dock__img${flagHidden ? ' is-awaiting' : ''}`}
+        />
+      </div>
+      <div className="gallery-flag-body">{body}</div>
+    </div>
+  )
+}
+
+export default function ProjectGallery({
+  images,
+  title,
+  heading = 'Gallery',
+  fit,
+  note,
+  flag,
+  flagHidden,
+}) {
   const { lowPower } = useLowPower()
   const [index, setIndex] = useState(0)
   const total = images?.length ?? 0
   const safeIndex = total ? Math.min(index, total - 1) : 0
+  const noteField = note ? <PokemonTextBox text={note} label={`${heading} note`} /> : null
 
   useEffect(() => {
     if (total < 2) return undefined
@@ -33,16 +67,20 @@ export default function ProjectGallery({ images, title, heading = 'Gallery', fit
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [total])
 
+  const galleryClass = 'project-gallery project-gallery--centered'
+
   if (!total) {
     return (
-      <div className="project-panel__section">
-        <h2>{heading}</h2>
-        <div className="project-gallery" aria-label={`${title} ${heading}`}>
-          <div className="project-gallery__frame project-gallery__frame--empty">
-            <p className="project-gallery__empty-label">No photos yet</p>
+      <GalleryShell heading={heading} flag={flag} flagHidden={flagHidden}>
+        {noteField}
+        <div className={galleryClass} aria-label={`${title} ${heading}`}>
+          <div className="project-gallery__slide">
+            <div className="project-gallery__frame project-gallery__frame--empty">
+              <p className="project-gallery__empty-label">No photos yet</p>
+            </div>
           </div>
         </div>
-      </div>
+      </GalleryShell>
     )
   }
 
@@ -62,46 +100,44 @@ export default function ProjectGallery({ images, title, heading = 'Gallery', fit
     .join(' ')
 
   return (
-    <div className="project-panel__section">
-      <h2>{heading}</h2>
+    <GalleryShell heading={heading} flag={flag} flagHidden={flagHidden}>
+      {noteField}
       <div
-        className="project-gallery"
+        className={galleryClass}
         aria-roledescription="carousel"
         aria-label={`${title} ${heading}`}
       >
-        <div className={frameClass}>
-          {showingVideo ? (
-            lowPower ? (
-              <LowPowerMediaNote
-                href={`https://www.youtube.com/watch?v=${current.youtubeId}`}
-                hrefLabel="Open on YouTube"
-              >
-                Video embeds are paused in low-power mode.
-              </LowPowerMediaNote>
+        <div className="project-gallery__slide">
+          <div className={frameClass}>
+            {showingVideo ? (
+              lowPower ? (
+                <LowPowerMediaNote
+                  href={`https://www.youtube.com/watch?v=${current.youtubeId}`}
+                  hrefLabel="Open on YouTube"
+                >
+                  Video embeds are paused in low-power mode.
+                </LowPowerMediaNote>
+              ) : (
+                <iframe
+                  key={current.youtubeId}
+                  className="project-gallery__video"
+                  src={`https://www.youtube.com/embed/${current.youtubeId}`}
+                  title={current.alt || `${title} video`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              )
             ) : (
-              <iframe
-                key={current.youtubeId}
-                className="project-gallery__video"
-                src={`https://www.youtube.com/embed/${current.youtubeId}`}
-                title={current.alt || `${title} video`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                loading="lazy"
+              <img
+                key={current.src}
+                src={assetUrl(current.src)}
+                alt={current.alt || `${title} photo ${safeIndex + 1} of ${total}`}
+                className="project-gallery__image"
               />
-            )
-          ) : (
-            <img
-              key={current.src}
-              src={assetUrl(current.src)}
-              alt={current.alt || `${title} photo ${safeIndex + 1} of ${total}`}
-              className="project-gallery__image"
-            />
-          )}
+            )}
+          </div>
         </div>
-
-        {current.caption || current.text ? (
-          <p className="project-gallery__caption">{current.caption || current.text}</p>
-        ) : null}
 
         <div className="project-gallery__controls">
           <button type="button" className="project-gallery__nav" onClick={() => go(-1)} aria-label="Previous slide">
@@ -133,6 +169,6 @@ export default function ProjectGallery({ images, title, heading = 'Gallery', fit
           </div>
         ) : null}
       </div>
-    </div>
+    </GalleryShell>
   )
 }

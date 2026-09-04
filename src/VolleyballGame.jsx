@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
+import PokemonTextBox from './PokemonTextBox.jsx'
 import './VolleyballGame.css'
 
 const COUNTDOWN_MS = 1000
@@ -294,9 +295,10 @@ export default function VolleyballGame({ onClose, ballSrc }) {
           <p className="vb-miss__score">
             Rally: <strong>{score}</strong>
           </p>
-          <p className="vb-miss__note">
-            I love all kind of sports - especially volleyball, badminton and tennis
-          </p>
+          <PokemonTextBox
+            text="I love all kind of sports - especially volleyball, badminton and tennis"
+            label="Volleyball note"
+          />
           <div className="vb-miss__actions">
             <button type="button" className="vb-btn vb-btn--primary" onClick={runCountdown}>
               Try again

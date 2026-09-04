@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import PokemonTextBox from './PokemonTextBox.jsx'
 
 export const STORAGE_KEY = 'low-power'
 
@@ -56,9 +57,14 @@ export function useLowPower() {
 }
 
 export function LowPowerMediaNote({ children, href, hrefLabel = 'Open separately' }) {
+  const text = typeof children === 'string' ? children : ''
   return (
     <div className="low-power-media">
-      <p>{children}</p>
+      <PokemonTextBox
+        text={text}
+        label="Low-power note"
+        doneContent={text ? null : children}
+      />
       {href ? (
         <a href={href} target="_blank" rel="noreferrer">
           {hrefLabel}

@@ -3,9 +3,11 @@ import { projects } from './data/projects.js'
 import { assetUrl } from './assetUrl.js'
 import ProjectPanel from './ProjectPanel.jsx'
 import VolleyballGame from './VolleyballGame.jsx'
+import ConfettiRain from './ConfettiRain.jsx'
 import NameIntro from './NameIntro.jsx'
 import UsageMeter from './UsageMeter.jsx'
 import { readLowPower, useLowPower } from './lowPower.jsx'
+import PokemonTextBox from './PokemonTextBox.jsx'
 import './App.css'
 
 const CORNER_SIZE = 128
@@ -72,6 +74,42 @@ function getGroupProjects(contentId) {
   )
 }
 
+/** Split the 4-flag cluster into origin rects that match the pile (JP/AT/ES/DK). */
+const FLAG_SPLIT = {
+  Japanese: { x: 0.02, y: 0.04, s: 0.58 },
+  Austrian: { x: 0.46, y: 0.0, s: 0.52 },
+  Spanish: { x: 0.0, y: 0.46, s: 0.54 },
+  Danish: { x: 0.36, y: 0.36, s: 0.6 },
+}
+
+function flyFlagGalleries(project) {
+  return (project?.galleries || []).filter((gallery) => gallery.flag && gallery.flyFlag)
+}
+
+function splitClusterOrigin(rect, heading) {
+  const split = FLAG_SPLIT[heading]
+  if (!rect) {
+    return { top: CORNER_INSET, left: CORNER_INSET, width: 96, height: 96 }
+  }
+  if (!split) {
+    return { top: rect.top, left: rect.left, width: rect.width, height: rect.height }
+  }
+  const side = Math.min(rect.width, rect.height) * split.s
+  return {
+    top: rect.top + rect.height * split.y,
+    left: rect.left + rect.width * split.x,
+    width: side,
+    height: side,
+  }
+}
+
+function measureFlagDock(heading) {
+  const el = document.querySelector(`[data-flag-dock="${heading}"]`)
+  const rect = el?.getBoundingClientRect()
+  if (!rect || rect.width < 2 || rect.height < 2) return null
+  return { top: rect.top, left: rect.left, width: rect.width, height: rect.height }
+}
+
 function App() {
   const { lowPower, toggleLowPower } = useLowPower()
   const [introOpen, setIntroOpen] = useState(() => !readLowPower())
@@ -79,10 +117,12 @@ function App() {
   const [activeId, setActiveId] = useState(null)
   const [flyGroup, setFlyGroup] = useState([])
   const [flySettled, setFlySettled] = useState(false)
+  const [flagsParked, setFlagsParked] = useState(false)
   const [panelOpen, setPanelOpen] = useState(false)
   const [volleyballOpen, setVolleyballOpen] = useState(false)
   const [phoneShakeId, setPhoneShakeId] = useState(null)
   const [phoneReveal, setPhoneReveal] = useState(null)
+  const [confettiBurst, setConfettiBurst] = useState(0)
   const [lowPowerNotice, setLowPowerNotice] = useState(false)
   const [positions, setPositions] = useState(loadSavedPositions)
   const [draggingId, setDraggingId] = useState(null)
@@ -91,8 +131,9 @@ function App() {
   const dragRef = useRef(null)
   const positionsRef = useRef(positions)
   const closeTimer = useRef(null)
+  const parkTimer = useRef(null)
+  const dockRetryTimer = useRef(null)
   const phoneShakeTimer = useRef(null)
-  const phoneInputRef = useRef(null)
   positionsRef.current = positions
 
   const active = projects.find((project) => project.id === activeId) ?? null
@@ -103,6 +144,8 @@ function App() {
   useEffect(() => {
     return () => {
       if (closeTimer.current) clearTimeout(closeTimer.current)
+      if (parkTimer.current) clearTimeout(parkTimer.current)
+      if (dockRetryTimer.current) clearTimeout(dockRetryTimer.current)
       if (phoneShakeTimer.current) clearTimeout(phoneShakeTimer.current)
     }
   }, [])
@@ -111,8 +154,6 @@ function App() {
 
   useEffect(() => {
     if (!phoneReveal) return undefined
-    phoneInputRef.current?.focus()
-    phoneInputRef.current?.select()
 
     function onKeyDown(event) {
       if (event.key === 'Escape') setPhoneReveal(null)
@@ -234,10 +275,71 @@ function App() {
       clearTimeout(closeTimer.current)
       closeTimer.current = null
     }
+    if (parkTimer.current) {
+      clearTimeout(parkTimer.current)
+      parkTimer.current = null
+    }
+    if (dockRetryTimer.current) {
+      clearTimeout(dockRetryTimer.current)
+      dockRetryTimer.current = null
+    }
 
     const contentId = resolveContentId(clickedId)
+    const content = projects.find((item) => item.id === contentId)
+    const flagGalleries = flyFlagGalleries(content)
     const group = getGroupProjects(contentId)
     const visibleGroup = group.filter((project) => !project.hideMarker)
+
+    if (flagGalleries.length) {
+      const source = markerRefs.current[clickedId]?.getBoundingClientRect()
+      const flights = flagGalleries.map((gallery) => ({
+        id: `gallery-flag-${gallery.heading}`,
+        dockId: gallery.heading,
+        icon: gallery.flag,
+        sticker: true,
+        from: splitClusterOrigin(source, gallery.heading),
+        to: splitClusterOrigin(source, gallery.heading),
+      }))
+      setFlyGroup(flights)
+      setFlagsParked(Boolean(lowPower))
+      setActiveId(contentId)
+      setFlySettled(false)
+      setPanelOpen(true)
+
+      if (lowPower) {
+        setFlySettled(true)
+        setFlagsParked(true)
+        return
+      }
+
+      const applyDockTargets = () => {
+        setFlyGroup((prev) =>
+          prev.map((flight) => ({
+            ...flight,
+            to: measureFlagDock(flight.dockId) || flight.to,
+          })),
+        )
+      }
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          applyDockTargets()
+          setFlySettled(true)
+          dockRetryTimer.current = setTimeout(() => {
+            applyDockTargets()
+            dockRetryTimer.current = null
+          }, 80)
+          parkTimer.current = setTimeout(() => {
+            applyDockTargets()
+            setFlagsParked(true)
+            parkTimer.current = null
+          }, CLOSE_MS)
+        })
+      })
+      return
+    }
+
+    setFlagsParked(false)
 
     if (!visibleGroup.length) {
       setFlyGroup([])
@@ -287,8 +389,28 @@ function App() {
   }
 
   function closeProject() {
+    if (parkTimer.current) {
+      clearTimeout(parkTimer.current)
+      parkTimer.current = null
+    }
+    if (dockRetryTimer.current) {
+      clearTimeout(dockRetryTimer.current)
+      dockRetryTimer.current = null
+    }
+
+    setFlyGroup((prev) =>
+      prev.map((flight) =>
+        flight.dockId
+          ? { ...flight, to: measureFlagDock(flight.dockId) || flight.to }
+          : flight,
+      ),
+    )
+    setFlagsParked(false)
     setPanelOpen(false)
-    setFlySettled(false)
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setFlySettled(false))
+    })
 
     closeTimer.current = setTimeout(() => {
       setActiveId(null)
@@ -350,7 +472,11 @@ function App() {
           role="status"
           onClick={(event) => event.stopPropagation()}
         >
-          <p>Low-power mode enabled - you are now browsing more sustainably</p>
+          <PokemonTextBox
+            compact
+            text="Low-power mode enabled - you are now browsing more sustainably"
+            label="Low-power notice"
+          />
           <button
             type="button"
             className="power-notice__close"
@@ -387,7 +513,8 @@ function App() {
         const externalUrl = project.externalUrl
         const isVolleyball = project.miniGame === 'volleyball'
         const isPhone = Boolean(project.phoneNumber)
-        const skipPanel = Boolean(externalUrl || isVolleyball || isPhone)
+        const isConfetti = Boolean(project.confetti)
+        const skipPanel = Boolean(externalUrl || isVolleyball || isPhone || isConfetti)
         const pos = posOf(project)
         const isDragging = draggingId === project.id
         return (
@@ -402,7 +529,9 @@ function App() {
                   ? `${label} mini-game`
                   : isPhone
                     ? `${label} number`
-                    : label
+                    : isConfetti
+                      ? `${label} — confetti`
+                      : label
             }
             aria-label={
               externalUrl
@@ -411,10 +540,12 @@ function App() {
                   ? `Play ${label} mini-game`
                   : isPhone
                     ? `Show ${label} number`
-                    : `Open ${label}`
+                    : isConfetti
+                      ? `Celebrate with confetti`
+                      : `Open ${label}`
             }
             aria-expanded={skipPanel ? undefined : isActive}
-            disabled={isOpen && !isActive && !externalUrl}
+            disabled={isOpen && !isActive && !externalUrl && !isConfetti}
             ref={(node) => {
               markerRefs.current[project.id] = node
             }}
@@ -452,6 +583,11 @@ function App() {
                 revealPhone(project)
                 return
               }
+              if (isConfetti) {
+                setPhoneReveal(null)
+                setConfettiBurst((n) => n + 1)
+                return
+              }
               openProject(project.id)
             }}
           >
@@ -462,6 +598,7 @@ function App() {
 
       {flyGroup.map((flight, index) => {
         const size = flight.size ?? CORNER_SIZE
+        const docked = Boolean(flySettled && flight.to)
         const style = !flySettled
           ? {
               top: flight.from.top,
@@ -469,17 +606,24 @@ function App() {
               width: flight.from.width,
               height: flight.from.height,
             }
-          : {
-              top: CORNER_INSET,
-              left: `calc(100vw - ${powerReserve() + size + index * (size + CORNER_GAP)}px)`,
-              width: size,
-              height: size,
-            }
+          : docked
+            ? {
+                top: flight.to.top,
+                left: flight.to.left,
+                width: flight.to.width,
+                height: flight.to.height,
+              }
+            : {
+                top: CORNER_INSET,
+                left: `calc(100vw - ${powerReserve() + size + index * (size + CORNER_GAP)}px)`,
+                width: size,
+                height: size,
+              }
 
         return (
           <div
             key={flight.id}
-            className={`flying-icon${flight.sticker ? ' is-sticker' : ''}${flySettled ? ' is-settled' : ''}`}
+            className={`flying-icon${flight.sticker ? ' is-sticker' : ''}${flySettled ? ' is-settled' : ''}${flagsParked ? ' is-parked' : ''}`}
             style={style}
             aria-hidden="true"
           >
@@ -498,20 +642,19 @@ function App() {
           }}
           onClick={(event) => event.stopPropagation()}
         >
-          <label htmlFor="phone-reveal-number">Give me a call</label>
-          <input
-            id="phone-reveal-number"
-            ref={phoneInputRef}
-            type="text"
-            readOnly
-            value={phoneReveal.number}
-            aria-label="Give me a call"
-            onFocus={(event) => event.target.select()}
-          />
+          <p className="phone-reveal__label">Give me a call</p>
+          <PokemonTextBox text={phoneReveal.number} label="Give me a call" compact />
         </div>
       ) : null}
 
-      <ProjectPanel project={active} open={panelOpen} onClose={closeProject} />
+      <ProjectPanel
+        project={active}
+        open={panelOpen}
+        onClose={closeProject}
+        awaitingFlags={
+          flagsParked ? undefined : new Set(flyGroup.map((flight) => flight.dockId).filter(Boolean))
+        }
+      />
 
       {volleyballOpen && (
         <VolleyballGame
@@ -519,6 +662,8 @@ function App() {
           ballSrc={assetUrl('/projects/project-2.png')}
         />
       )}
+
+      <ConfettiRain burstId={confettiBurst} />
     </main>
   )
 }

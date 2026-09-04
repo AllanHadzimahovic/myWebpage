@@ -47,19 +47,20 @@ html.low-power .landing {
     filter 420ms ease;
 }
 
-/* Contact pane: same softer treatment so the landing stays visible behind the form */
+/* Contact pane: dim the landing so the mailto sticker stays readable */
 .landing.is-contact .stage {
-  opacity: 0.62;
-  filter: blur(1.5px);
+  opacity: 0.22;
+  filter: blur(6px);
   pointer-events: none;
   transition:
     opacity 420ms ease,
     filter 420ms ease;
 }
 
-.landing.is-contact .project-marker {
-  opacity: 0.55;
-  filter: blur(1px);
+.landing.is-contact .project-marker,
+.landing.is-contact .flying-icon {
+  opacity: 0.18;
+  filter: blur(4px);
   pointer-events: none;
   transition:
     opacity 420ms ease,
@@ -102,6 +103,7 @@ html.low-power .landing {
   border: 0;
   background: transparent;
   border-radius: 0;
+  overflow: visible;
   transform: translate(-50%, -50%);
   /* White silhouette + shadow are baked into the PNG (die-cut sticker). */
   box-shadow: none;
@@ -247,22 +249,25 @@ html.low-power .landing {
   }
 }
 
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 90;
+  pointer-events: none;
+}
+
 .phone-reveal {
   position: absolute;
   z-index: 9;
-  left: clamp(7.5rem, var(--phone-x), calc(100vw - 7.5rem));
+  left: clamp(10rem, var(--phone-x), calc(100vw - 10rem));
   transform: translate(-50%, calc(var(--sticker-size, 108px) * 0.52 + 10px));
-  width: 13.5rem;
+  width: min(22rem, calc(100vw - 1.5rem));
   box-sizing: border-box;
-  padding: 0.6rem 0.7rem 0.7rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(20, 24, 34, 0.94);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
 }
 
-.phone-reveal label {
+.phone-reveal__label {
   display: block;
   margin: 0 0 0.35rem;
   color: #5eead4;
@@ -271,24 +276,8 @@ html.low-power .landing {
   text-align: center;
 }
 
-.phone-reveal input {
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  background: #0b0d12;
-  color: #e8eaef;
-  font: inherit;
-  font-size: 1.05rem;
-  letter-spacing: 0.08em;
-  padding: 0.45rem 0.6rem;
-  text-align: center;
-}
-
-.phone-reveal input:focus {
-  outline: none;
-  border-color: rgba(94, 234, 212, 0.55);
+.phone-reveal .poke-box {
+  margin-bottom: 0;
 }
 
 .flying-icon {
@@ -321,6 +310,10 @@ html.low-power .landing {
 
 .flying-icon.is-sticker.is-settled {
   border-radius: 0;
+}
+
+.flying-icon.is-parked {
+  opacity: 0;
 }
 
 .flying-icon img {
@@ -492,16 +485,20 @@ html.low-power .landing {
   right: 16px;
   z-index: 81;
   display: flex;
-  align-items: flex-start;
-  gap: 0.45rem;
-  width: min(17.5rem, calc(100vw - 2rem));
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  width: min(24rem, calc(100vw - 2rem));
   box-sizing: border-box;
-  padding: 0.65rem 0.55rem 0.65rem 0.75rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(20, 24, 34, 0.94);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   color: #e8eaef;
+}
+
+.power-notice .poke-box {
+  margin-bottom: 0;
 }
 
 .power-notice p {
@@ -534,15 +531,10 @@ html.low-power .landing {
 
 .low-power-media {
   margin: 0;
-  padding: 1rem 1.1rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: #111;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: inherit;
-}
-
-.low-power-media p {
-  margin: 0 0 0.65rem;
-  line-height: 1.45;
 }
 
 .low-power-media a {
@@ -563,7 +555,8 @@ html.low-power .landing.is-dimmed .stage,
 html.low-power .landing.is-volleyball .stage,
 html.low-power .landing.is-contact .stage,
 html.low-power .landing.is-volleyball .project-marker,
-html.low-power .landing.is-contact .project-marker {
+html.low-power .landing.is-contact .project-marker,
+html.low-power .landing.is-contact .flying-icon {
   filter: none;
 }
 
@@ -619,14 +612,22 @@ html.low-power *::after {
 
 .project-panel--contact {
   background:
-    linear-gradient(180deg, rgba(11, 13, 18, 0.28) 0%, rgba(11, 13, 18, 0.45) 40%, rgba(11, 13, 18, 0.62) 100%);
-  backdrop-filter: blur(2px);
+    linear-gradient(180deg, rgba(11, 13, 18, 0.55) 0%, rgba(11, 13, 18, 0.72) 45%, rgba(11, 13, 18, 0.82) 100%);
+  backdrop-filter: blur(8px);
 }
 
 .project-panel__inner {
   width: min(760px, calc(100% - 2rem));
   margin: 0 auto;
   padding: 5.5rem 0 3rem;
+}
+
+.project-panel--wide .project-panel__inner {
+  width: min(960px, calc(100% - 2rem));
+}
+
+.project-panel--documents .project-panel__inner {
+  width: min(1240px, calc(100% - 2rem));
 }
 
 .project-panel__close {
@@ -682,6 +683,39 @@ html.low-power *::after {
   margin-bottom: 2rem;
 }
 
+.project-panel__section--flag-gallery {
+  display: grid;
+  grid-template-columns: 6.75rem minmax(0, 1fr);
+  gap: 0.85rem 1.15rem;
+  align-items: start;
+}
+
+.gallery-flag-dock {
+  width: 6.75rem;
+  height: 6.75rem;
+}
+
+.gallery-flag-dock__img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  transition: opacity 160ms ease;
+}
+
+.gallery-flag-dock__img.is-awaiting {
+  opacity: 0;
+}
+
+.gallery-flag-body h2 {
+  margin-top: 0;
+}
+
+.project-panel__section--flag-gallery .project-gallery__frame--empty {
+  margin-inline: 0;
+  max-width: 100%;
+}
+
 .project-panel__section h2 {
   margin: 0 0 0.75rem;
   font-size: 0.95rem;
@@ -698,6 +732,21 @@ html.low-power *::after {
   white-space: pre-wrap;
 }
 
+.project-panel__body + .project-panel__body {
+  margin-top: 0.9rem;
+}
+
+.project-panel__body a {
+  color: #5eead4;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.project-panel__body a:hover,
+.project-panel__body a:focus-visible {
+  color: #99f6e4;
+}
+
 .project-panel__header--contact {
   margin-bottom: 1.25rem;
   padding-right: 6rem;
@@ -709,6 +758,47 @@ html.low-power *::after {
 
 .project-panel__section--contact {
   margin-bottom: 0;
+}
+
+.contact-mailto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  width: fit-content;
+  margin: 1.25rem auto 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.contact-mailto:focus-visible {
+  outline: 2px solid #5eead4;
+  outline-offset: 8px;
+  border-radius: 16px;
+}
+
+.contact-mailto__sticker {
+  display: block;
+  width: min(280px, 70vw);
+  height: auto;
+  background: transparent;
+}
+
+.contact-mailto__label {
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: #5eead4;
+  text-align: center;
+}
+
+.contact-mailto:hover .contact-mailto__label,
+.contact-mailto:focus-visible .contact-mailto__label {
+  color: #99f6e4;
 }
 
 .contact-composer {
@@ -775,38 +865,8 @@ html.low-power *::after {
   color: #5eead4;
 }
 
-.contact-composer__field input,
-.contact-composer__field textarea {
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: #0b0d12;
-  color: #e8ecf4;
-  font: inherit;
-  font-size: 1rem;
-  padding: 0.75rem 0.9rem;
-  outline: none;
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.contact-composer__field textarea {
-  resize: vertical;
-  min-height: 11rem;
-  line-height: 1.55;
-}
-
-.contact-composer__field input::placeholder,
-.contact-composer__field textarea::placeholder {
-  color: #6b7386;
-}
-
-.contact-composer__field input:focus,
-.contact-composer__field textarea:focus {
-  border-color: rgba(94, 234, 212, 0.55);
-  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.12);
+.contact-composer__field .poke-box {
+  margin-bottom: 0;
 }
 
 .contact-composer__consent {
@@ -971,6 +1031,42 @@ html.low-power *::after {
   height: auto;
 }
 
+.project-stills:not(.project-stills--pair) .project-stills__frame {
+  max-width: min(100%, 26rem);
+  margin-inline: auto;
+}
+
+.web-embed__photos {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0 0 1.15rem;
+}
+
+.web-embed__photos--row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.web-embed__photos .web-embed__photo {
+  margin: 0;
+}
+
+.web-embed__photo {
+  margin: 0 0 1.15rem;
+}
+
+.web-embed__photo--portrait {
+  max-width: min(100%, 26rem);
+  margin-inline: auto;
+  margin-bottom: 1.15rem;
+}
+
+@media (max-width: 640px) {
+  .web-embed__photos--row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .project-stills--pair .project-stills__frame:last-child img {
   border-radius: 16px;
 }
@@ -990,6 +1086,10 @@ html.low-power *::after {
   background: #141820;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.project-panel--documents .project-panel__pdf {
+  height: min(92svh, 1400px);
 }
 
 .project-panel__pdf iframe {
@@ -1378,6 +1478,27 @@ html.low-power *::after {
   gap: 0.85rem;
 }
 
+.project-gallery__slide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.project-gallery--centered {
+  justify-items: center;
+}
+
+.project-gallery--centered .project-gallery__slide,
+.project-gallery--centered .project-gallery__controls,
+.project-gallery--centered .project-gallery__dots {
+  width: min(100%, 44rem);
+}
+
+.project-gallery--centered .project-gallery__slide {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .project-gallery__frame {
   position: relative;
   width: 100%;
@@ -1405,12 +1526,125 @@ html.low-power *::after {
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
 }
 
-.project-gallery__caption {
-  margin: 0;
-  color: #d5dae6;
-  font-size: 1.02rem;
-  line-height: 1.65;
+.poke-box {
+  --poke-frame: none;
+  position: relative;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 0.85rem;
+  padding: 0.35rem 1.25rem 0.95rem 0.7rem;
+  background-color: transparent;
+  border: 26px solid transparent;
+  border-image-source: var(--poke-frame);
+  border-image-slice: 54 fill;
+  border-image-repeat: stretch;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  color: #181818;
+  font-family: 'Press Start 2P', 'Hiragino Maru Gothic ProN', 'Yu Gothic', monospace;
+  font-size: 0.68rem;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  text-align: left;
+  cursor: pointer;
+  min-height: 7.5rem;
+  -webkit-font-smoothing: none;
+}
+
+.poke-box:focus-visible {
+  outline: 2px solid #5eead4;
+  outline-offset: 3px;
+}
+
+.poke-box__text,
+.poke-box__rich {
+  display: block;
+  min-height: 2.6em;
   white-space: pre-wrap;
+  word-break: break-word;
+  user-select: text;
+}
+
+.poke-box__rich .project-panel__body {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre-wrap;
+}
+
+.poke-box__rich .project-panel__body + .project-panel__body {
+  margin-top: 0.75em;
+}
+
+.poke-box a {
+  color: #0a7a32;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.poke-box.is-compact {
+  min-height: 0;
+  padding-top: 0.2rem;
+  padding-bottom: 0.35rem;
+}
+
+.poke-box.is-compact .poke-box__text {
+  min-height: 1.6em;
+}
+
+.poke-box:has(.poke-box__input) {
+  cursor: text;
+}
+
+.poke-box__input {
+  display: block;
+  width: 100%;
+  min-height: 7.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.poke-box.is-compact .poke-box__input {
+  min-height: 1.7em;
+  resize: none;
+}
+
+.poke-box__input::placeholder {
+  color: #7a7a7a;
+}
+
+.poke-box__arrow {
+  position: absolute;
+  right: 1.55rem;
+  bottom: 1.05rem;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #111;
+  animation: poke-arrow-blink 0.53s steps(2, end) infinite;
+}
+
+@keyframes poke-arrow-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .favorites-box {
@@ -1461,6 +1695,20 @@ html.low-power *::after {
 
 @media (max-width: 640px) {
   .favorites-box {
+    grid-template-columns: 1fr;
+  }
+
+  .project-panel__section--flag-gallery {
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+    gap: 0.7rem 0.85rem;
+  }
+
+  .gallery-flag-dock {
+    width: 5.25rem;
+    height: 5.25rem;
+  }
+
+  .project-gallery__slide {
     grid-template-columns: 1fr;
   }
 }
@@ -1793,6 +2041,18 @@ html.low-power *::after {
   font-size: 0.75rem;
 }
 
+.language-sticker-grid__intro {
+  margin: 0 0 0.85rem;
+  color: #6b7384;
+  font-size: 0.95rem;
+}
+
+.language-sticker-grid__empty {
+  margin: 0;
+  color: #6b7384;
+  font-size: 0.95rem;
+}
+
 .language-note {
   position: fixed;
   inset: 0;
@@ -1805,43 +2065,18 @@ html.low-power *::after {
 }
 
 .language-note__box {
-  width: min(34rem, 100%);
+  width: min(36rem, 100%);
   box-sizing: border-box;
-  padding: 0.85rem 0.9rem 1rem;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(20, 24, 34, 0.96);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+  display: grid;
+  gap: 0.55rem;
 }
 
-.language-note__box label {
+.language-note__title {
   display: block;
   margin: 0 0 0.45rem;
   color: #5eead4;
   font-size: 0.8rem;
   letter-spacing: 0.04em;
-}
-
-.language-note__field {
-  display: block;
-  width: 100%;
-  min-height: 10rem;
-  box-sizing: border-box;
-  margin: 0 0 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  background: #0b0d12;
-  color: #e8eaef;
-  font: inherit;
-  font-size: 1rem;
-  line-height: 1.55;
-  padding: 0.7rem 0.8rem;
-  resize: vertical;
-}
-
-.language-note__field:focus {
-  outline: none;
-  border-color: rgba(94, 234, 212, 0.55);
 }
 
 .language-note__close {

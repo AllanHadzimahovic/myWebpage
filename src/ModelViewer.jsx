@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
+import PokemonTextBox from './PokemonTextBox.jsx'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
@@ -321,11 +322,11 @@ export default function ModelViewer({
       <div className="model-viewer__toolbar">
         <div>
           <p className="model-viewer__title">{title}</p>
-          <p className="model-viewer__status" role="status">
-            {fileLabel ? <strong>{fileLabel}</strong> : null}
-            {fileLabel ? ' — ' : null}
-            {status}
-          </p>
+          <PokemonTextBox
+            compact
+            label={`${title} status`}
+            text={fileLabel ? `${fileLabel} — ${status}` : status}
+          />
         </div>
         {allowUpload ? (
           <label className="model-viewer__upload">
@@ -348,8 +349,8 @@ export default function ModelViewer({
         {...dropHandlers}
       />
 
-      {error ? <p className="model-viewer__error">{error}</p> : null}
-      {note ? <p className="model-viewer__note">{note}</p> : null}
+      {error ? <PokemonTextBox text={error} label={`${title} error`} /> : null}
+      {note ? <PokemonTextBox text={note} label={`${title} note`} /> : null}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { LowPowerMediaNote, useLowPower } from './lowPower.jsx'
+import PokemonTextBox from './PokemonTextBox.jsx'
 
 /**
  * Embeds an external web app in an iframe, with fullscreen + open-in-new-tab.
@@ -39,7 +40,7 @@ export default function WebEmbed({
       <div className="web-embed__toolbar">
         <div>
           <p className="web-embed__title">{title}</p>
-          {status ? <p className="web-embed__status">{status}</p> : null}
+          {status ? <PokemonTextBox text={status} label={`${title} status`} compact /> : null}
         </div>
         <div className="web-embed__actions">
           <button
@@ -66,7 +67,7 @@ export default function WebEmbed({
         />
       </div>
 
-      {note ? <p className="web-embed__note">{note}</p> : null}
+      {note ? <PokemonTextBox text={note} label={`${title} note`} /> : null}
     </div>
   )
 }
