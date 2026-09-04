@@ -126,7 +126,7 @@ export default function UnityPlayer({ title = 'Unity game', src, note }) {
                 ? 'Checking for WebGL build…'
                 : started
                   ? 'Game loaded — click the canvas if controls feel unresponsive.'
-                  : 'Click Play to load the game (large download).'
+                  : 'Click Play - WASD to move, SPACE to attack, and P to pause'
             }
           />
         </div>
